@@ -9,10 +9,26 @@
 <body>
     <header>
         <nav>
-            <a href="/" class="logo">WAA Platform</a>
+            <a href="/" class="logo">Max</a>
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    <span>{{ current_user.username }}</span>
+                    <a href="{{ url_for('auth.logout') }}">Log out</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}">Log in</a>
+                    <a href="{{ url_for('auth.register') }}">Register</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
     <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
 </body>

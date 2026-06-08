@@ -29,7 +29,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.web
     ports:
-      - "${WEB_PORT:-8000}:8000"
+      - "${WEB_PORT:-7077}:8000"
     environment:
       FLASK_ENV: ${FLASK_ENV:-production}
       SECRET_KEY: ${SECRET_KEY:-changeme}
@@ -53,6 +53,7 @@ services:
       REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
       ENGINE_NAME: ${ENGINE_NAME:-engine-default}
       ENGINE_NETWORK_TAG: ${ENGINE_NETWORK_TAG:-default}
+      HOST_IP: ${HOST_IP}
       WEB_API_URL: http://web:8000
     depends_on:
       db:

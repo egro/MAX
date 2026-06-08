@@ -66,9 +66,9 @@ No app code changes needed — it's a networking config change.
 
 | Phase | Status |
 |-------|--------|
-| **A:** Docker & Foundation | `[NOT STARTED]` |
-| **B:** Auth & User Model | `[NOT STARTED]` |
-| **C:** Engine Registration + Health | `[NOT STARTED]` |
+| **A:** Docker & Foundation | `[DONE]` |
+| **B:** Auth & User Model | `[DONE]` |
+| **C:** Engine Registration + Health | `[DONE]` |
 | **D:** Assessment CRUD + DB Schema | `[NOT STARTED]` |
 | **E:** Celery Task Framework + Live Output | `[NOT STARTED]` |
 | **F:** Phase Tasks (Tool Orchestration) | `[NOT STARTED]` |
@@ -149,7 +149,7 @@ buildme/
 
 ---
 
-## Phase A: Docker & Foundation `[NOT STARTED]`
+## Phase A: Docker & Foundation `[DONE]`
 
 - [ ] `docker/Dockerfile.web` — python:3.12-slim, Flask + gunicorn, no attack tools
 - [ ] `docker/Dockerfile.engine` — Kali Linux + Python + Celery + all attack tools (dig, nmap, nikto, gobuster, sqlmap, ffuf, nuclei, wafw00f, whatweb, openssl, sslscan, whois, curl, wget)
@@ -164,7 +164,7 @@ buildme/
 
 ---
 
-## Phase B: Auth & User Model `[NOT STARTED]`
+## Phase B: Auth & User Model `[DONE]`
 
 - [ ] `app/models/user.py` — User model (id, username, password_hash, role, created_at)
 - [ ] `app/routes/auth.py` — login, logout, register endpoints
@@ -174,7 +174,7 @@ buildme/
 
 ---
 
-## Phase C: Engine Registration + Health `[NOT STARTED]`
+## Phase C: Engine Registration + Health `[DONE]`
 
 - [ ] `app/models/engine.py` — Engine model (id, name, network_tag, ip, status, last_heartbeat_at, registered_at)
 - [ ] `app/services/engine_registry.py` — engine selection logic (find online engine by network_tag)

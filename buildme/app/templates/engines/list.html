@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Engine Health</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Network Tag</th>
+            <th>IP</th>
+            <th>Status</th>
+            <th>Last Heartbeat</th>
+            <th>Registered</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for engine in engines %}
+        <tr>
+            <td>{{ engine.name }}</td>
+            <td>{{ engine.network_tag }}</td>
+            <td>{{ engine.ip }}</td>
+            <td class="status-{{ engine.status }}">{{ engine.status }}</td>
+            <td>{{ engine.last_heartbeat_at | datetime if engine.last_heartbeat_at else '—' }}</td>
+            <td>{{ engine.registered_at | datetime }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">No engines registered.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

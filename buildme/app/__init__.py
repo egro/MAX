@@ -1,6 +1,9 @@
 from flask import Flask, render_template
 from app.config import Config
 from app.extensions import db, migrate, login_manager, celery
+from app.models.user import User
+from app.routes.auth import auth
+from app.routes.engines import engines
 
 
 def create_app(config_class=Config):
@@ -10,6 +13,12 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    app.register_blueprint(auth)
+    app.register_blueprint(engines)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.get(User, int(user_id))
 
     celery.conf.update(
         broker_url=app.config['CELERY_BROKER_URL'],
@@ -24,8 +33,11 @@ def create_app(config_class=Config):
     celery.Task = ContextTask
 
     with app.app_context():
-        from app.extensions import db
         db.create_all()
+
+    @app.template_filter('datetime')
+    def format_datetime(value):
+        return value.strftime('%Y-%m-%d %H:%M:%S UTC')
 
     @app.route('/')
     def index():

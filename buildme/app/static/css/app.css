@@ -18,6 +18,9 @@ header {
 }
 
 header nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -29,8 +32,106 @@ header nav .logo {
     font-weight: 600;
 }
 
+header nav .nav-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+header nav .nav-links a,
+header nav .nav-links span {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+header nav .nav-links a:hover {
+    text-decoration: underline;
+}
+
 main {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
+}
+
+.flash {
+    background: #d4edda;
+    color: #155724;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+form div {
+    margin-bottom: 0.75rem;
+}
+
+form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+form button {
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+form button:hover {
+    background: #16213e;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+table th, table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+table th {
+    background: #1a1a2e;
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+table tr:last-child td {
+    border-bottom: none;
+}
+
+.status-online {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status-offline {
+    color: #dc3545;
+    font-weight: 600;
 }
