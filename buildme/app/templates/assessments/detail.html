@@ -22,18 +22,26 @@
       <th>Started</th>
       <th>Completed</th>
       <th>Engine</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     {% for p in phases %}
-    <tr>
+    <tr data-phase-id="{{ p.id }}">
       <td>{{ p.order + 1 }}</td>
       <td>{{ p.phase_definition.label }}</td>
       <td><span class="badge-{{ p.phase_definition.category }}">{{ p.phase_definition.category }}</span></td>
-      <td class="status-{{ p.status }}">{{ p.status }}</td>
+      <td class="status-{{ p.status }} phase-status">{{ p.status }}</td>
       <td>{{ p.started_at | datetime if p.started_at else '--' }}</td>
       <td>{{ p.completed_at | datetime if p.completed_at else '--' }}</td>
-      <td>{{ p.engine.name if p.engine else '--' }}</td>
+      <td class="phase-engine">{{ p.engine.name if p.engine else '--' }}</td>
+      <td>
+        {% if p.status in ('pending', 'failed') %}
+        <button class="btn-small btn-run" data-phase-id="{{ p.id }}">Run</button>
+        {% elif p.status == 'running' %}
+        <button class="btn-small btn-danger btn-stop" data-phase-id="{{ p.id }}">Stop</button>
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -42,6 +50,19 @@
 <p>No phases configured.</p>
 {% endif %}
 
+<h3>Live Output</h3>
+<div id="output-tabs">
+  {% for p in phases %}
+  <button class="output-tab" data-phase-id="{{ p.id }}"
+          {% if p.status == 'pending' %}disabled{% endif %}>
+    {{ p.phase_definition.label }}
+  </button>
+  {% endfor %}
+</div>
+<div id="output-console">
+  <pre id="output-content">Select a phase to view output.</pre>
+</div>
+
 <p>
   <a href="{{ url_for('assessments.list_view') }}" class="btn">Back to Assessments</a>
   <form method="POST" action="{{ url_for('assessments.delete', id=assessment.id) }}" style="display:inline">
@@ -49,4 +70,139 @@
             onclick="return confirm('Delete this assessment?')">Delete</button>
   </form>
 </p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  var activePhaseId = null;
+  var eventSource = null;
+  var outputEl = document.getElementById('output-content');
+  var currentAssessmentId = {{ assessment.id }};
+
+  function appendOutput(line) {
+    outputEl.textContent += line + '\n';
+    outputEl.scrollTop = outputEl.scrollHeight;
+  }
+
+  function setPhaseStatus(phaseId, status) {
+    var row = document.querySelector('tr[data-phase-id="' + phaseId + '"]');
+    if (row) {
+      var statusEl = row.querySelector('.phase-status');
+      if (statusEl) {
+        statusEl.className = 'phase-status status-' + status;
+        statusEl.textContent = status;
+      }
+      var btnCell = row.querySelector('td:last-child');
+      if (status === 'running') {
+        if (btnCell) {
+          btnCell.innerHTML = '<button class="btn-small btn-danger btn-stop" data-phase-id="' + phaseId + '">Stop</button>';
+        }
+        var disableTab = document.querySelector('.output-tab[data-phase-id="' + phaseId + '"]');
+        if (disableTab) disableTab.disabled = false;
+      } else if (status === 'completed' || status === 'failed') {
+        if (btnCell) {
+          if (status === 'failed') {
+            btnCell.innerHTML = '<button class="btn-small btn-run" data-phase-id="' + phaseId + '">Run</button>';
+          } else {
+            btnCell.innerHTML = '';
+          }
+        }
+      }
+    }
+  }
+
+  function connectStream(phaseId) {
+    if (eventSource) {
+      eventSource.close();
+    }
+    outputEl.textContent = '';
+    activePhaseId = phaseId;
+    eventSource = new EventSource('/assessments/' + currentAssessmentId + '/phases/' + phaseId + '/stream');
+
+    eventSource.onmessage = function(e) {
+      var data = JSON.parse(e.data);
+      if (data.type === 'output') {
+        appendOutput(data.line);
+      } else if (data.type === 'status') {
+        appendOutput('--- Phase ' + data.status + ' ---');
+        setPhaseStatus(phaseId, data.status);
+        eventSource.close();
+        eventSource = null;
+        activePhaseId = null;
+      }
+    };
+
+    eventSource.onerror = function() {
+      appendOutput('--- Connection lost ---');
+      eventSource.close();
+      eventSource = null;
+      activePhaseId = null;
+    };
+  }
+
+  document.addEventListener('click', function(e) {
+    var runBtn = e.target.closest('.btn-run');
+    if (runBtn) {
+      var phaseId = runBtn.dataset.phaseId;
+      runBtn.disabled = true;
+      runBtn.textContent = 'Starting...';
+      fetch('/assessments/' + currentAssessmentId + '/phases/' + phaseId + '/run', {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) {
+          appendOutput('Error: ' + data.error);
+          runBtn.disabled = false;
+          runBtn.textContent = 'Run';
+        } else {
+          setPhaseStatus(phaseId, 'running');
+          var tab = document.querySelector('.output-tab[data-phase-id="' + phaseId + '"]');
+          if (tab) tab.click();
+        }
+      })
+      .catch(function(err) {
+        appendOutput('Error: ' + err);
+        runBtn.disabled = false;
+        runBtn.textContent = 'Run';
+      });
+      return;
+    }
+
+    var stopBtn = e.target.closest('.btn-stop');
+    if (stopBtn) {
+      var phaseId = stopBtn.dataset.phaseId;
+      if (!confirm('Stop this phase?')) return;
+      stopBtn.disabled = true;
+      fetch('/assessments/' + currentAssessmentId + '/phases/' + phaseId + '/stop', {
+        method: 'POST',
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.error) {
+          appendOutput('Error: ' + data.error);
+        }
+      })
+      .catch(function(err) {
+        appendOutput('Error: ' + err);
+      });
+      return;
+    }
+
+    var tabBtn = e.target.closest('.output-tab');
+    if (tabBtn && !tabBtn.disabled) {
+      document.querySelectorAll('.output-tab').forEach(function(t) { t.classList.remove('active'); });
+      tabBtn.classList.add('active');
+      var phaseId = tabBtn.dataset.phaseId;
+      connectStream(phaseId);
+    }
+  });
+
+  var firstActive = document.querySelector('.output-tab:not([disabled])');
+  if (firstActive) firstActive.click();
+})();
+</script>
 {% endblock %}

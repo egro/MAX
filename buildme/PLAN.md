@@ -82,8 +82,8 @@ Shipped with the app and stored in the DB. Users with `admin` role can create/ed
 | **B:** Auth & User Model | `[DONE]` |
 | **C:** Engine Registration + Health | `[DONE]` |
 | **D:** Assessment + PhaseDefinition CRUD | `[DONE]` |
-| **E:** Celery Task Framework + Live Output | `[NOT STARTED]` |
-| **F:** Tool Installation & Engine Readiness | `[NOT STARTED]` |
+| **E:** Celery Task Framework + Live Output | `[DONE]` |
+| **F:** Tool Installation & Engine Readiness | `[DONE]` |
 | **G:** Findings Management | `[NOT STARTED]` |
 | **H:** Report Generation | `[NOT STARTED]` |
 | **I:** API Layer | `[NOT STARTED]` |
@@ -212,19 +212,24 @@ buildme/
 
 ---
 
-## Phase E: Celery Task Framework + Live Output `[NOT STARTED]`
+## Phase E: Celery Task Framework + Live Output `[DONE]`
 
-- [ ] Celery config in `extensions.py` (broker=redis with password, result backend=redis)
-- [ ] `app/services/tool_runner.py` — subprocess wrapper: takes command_template + target, substitutes `{target}`, executes, streams output via Redis pub/sub
-- [ ] SSE endpoint per assessment — client opens EventSource, server subscribes to Redis channel, streams lines
-- [ ] Phase control buttons in detail.html (trigger phase, stop phase)
-- [ ] Live output panel in detail.html
+- [x] Celery config in `extensions.py` (broker=redis with password, result backend=redis)
+- [x] `app/services/tool_runner.py` — subprocess wrapper: takes command_template + target, substitutes `{target}`, executes, streams output via Redis pub/sub with history buffer
+- [x] `app/tasks/phase_tasks.py` — Celery task `run_phase_task` dispatches phase execution, updates status/engine in DB
+- [x] SSE endpoint `GET /assessments/<id>/phases/<phase_id>/stream` — replays history then subscribes to live Redis pub/sub
+- [x] Phase control buttons in detail.html — `Run` (pending/failed) and `Stop` (running), wired to POST endpoints
+- [x] Live output panel with tabbed per-phase output and dark terminal console
+- [x] `POST /assessments/<id>/phases/<phase_id>/run` — finds online engine, dispatches Celery task, returns task_id
+- [x] `POST /assessments/<id>/phases/<phase_id>/stop` — revokes Celery task (terminate=True), marks phase failed
+- [x] Gevent worker type for gunicorn to handle long-lived SSE connections
+- [x] Explicit `redis>=5.0` and `gevent>=24` in requirements.txt
 
 ---
 
-## Phase F: Tool Installation & Engine Readiness `[NOT STARTED]`
+## Phase F: Tool Installation & Engine Readiness `[DONE]`
 
-- [ ] Add to `engine/Dockerfile.engine`:
+- [x] Added to `engine/Dockerfile.engine`:
   - lynis — compliance/hardening auditing
   - hydra — credential brute-force
   - smbclient, enum4linux — SMB enumeration
@@ -232,6 +237,7 @@ buildme/
   - clamav, chkrootkit, rkhunter — malware/rootkit scanning
   - impacket-scripts — Windows protocol/AD testing
   - wordlists (dirb, rockyou, etc.) — bundled in image
+- [x] Verified all tools present in built image
 
 ---
 

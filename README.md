@@ -136,8 +136,8 @@ buildme/
 | B | Auth & User Model | Done |
 | C | Engine Registration + Health | Done |
 | D | Assessment + PhaseDefinition CRUD | Done |
-| E | Celery Task Framework + Live Output | Not started |
-| F | Tool Installation & Engine Readiness | Not started |
+| E | Celery Task Framework + Live Output | Done |
+| F | Tool Installation & Engine Readiness | Done |
 | G | Findings Management | Not started |
 | H | Report Generation | Not started |
 | I | API Layer | Not started |

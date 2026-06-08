@@ -1,10 +1,16 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required, current_user
+import json
+from datetime import datetime, timezone
+
+import redis as redis_lib
+from flask import Blueprint, Response, current_app, flash, jsonify, redirect, render_template, request, stream_with_context, url_for
+from flask_login import current_user, login_required
 
 from app.extensions import db
 from app.models.assessment import Assessment
 from app.models.assessment_phase import AssessmentPhase
 from app.models.phase_definition import PhaseDefinition
+from app.services.engine_registry import find_any_online_engine
+from app.tasks.phase_tasks import run_phase_task
 
 assessments = Blueprint('assessments', __name__, url_prefix='/assessments')
 
@@ -104,3 +110,115 @@ def delete(id):
     db.session.commit()
     flash('Assessment deleted.')
     return redirect(url_for('assessments.list_view'))
+
+
+@assessments.route('/<int:id>/phases/<int:phase_id>/run', methods=['POST'])
+@login_required
+def run_phase(id, phase_id):
+    assessment = db.session.get(Assessment, id)
+    if not assessment:
+        return jsonify({'error': 'Assessment not found'}), 404
+
+    ap = db.session.get(AssessmentPhase, phase_id)
+    if not ap or ap.assessment_id != id:
+        return jsonify({'error': 'Phase not found'}), 404
+
+    if ap.status not in ('pending', 'failed'):
+        return jsonify({'error': f'Phase is {ap.status}, cannot run'}), 400
+
+    engine = find_any_online_engine()
+    if not engine:
+        return jsonify({'error': 'No online engines available'}), 503
+
+    ap.status = 'running'
+    ap.started_at = datetime.now(timezone.utc)
+    ap.engine_id = engine.id
+    ap.task_id = None
+    db.session.commit()
+
+    task = run_phase_task.apply_async(
+        args=[id, phase_id],
+        queue=engine.network_tag,
+    )
+
+    ap.task_id = task.id
+    db.session.commit()
+
+    assessment.status = 'running'
+    db.session.commit()
+
+    return jsonify({'status': 'started', 'task_id': task.id})
+
+
+@assessments.route('/<int:id>/phases/<int:phase_id>/stop', methods=['POST'])
+@login_required
+def stop_phase(id, phase_id):
+    ap = db.session.get(AssessmentPhase, phase_id)
+    if not ap or ap.assessment_id != id:
+        return jsonify({'error': 'Phase not found'}), 404
+
+    if ap.status != 'running':
+        return jsonify({'error': 'Phase is not running'}), 400
+
+    if ap.task_id:
+        from app.extensions import celery
+        celery.control.revoke(ap.task_id, terminate=True)
+
+    ap.status = 'failed'
+    ap.completed_at = datetime.now(timezone.utc)
+    db.session.commit()
+
+    return jsonify({'status': 'stopped'})
+
+
+@assessments.route('/<int:id>/phases/<int:phase_id>/stream')
+@login_required
+def stream_phase(id, phase_id):
+    ap = db.session.get(AssessmentPhase, phase_id)
+    if not ap or ap.assessment_id != id:
+        return jsonify({'error': 'Phase not found'}), 404
+
+    redis_url = current_app.config.get('REDIS_URL', 'redis://localhost:6379/0')
+
+    def generate():
+        r = redis_lib.Redis.from_url(redis_url)
+        channel = f"phase:{id}:{phase_id}"
+        history_key = f"phase:{id}:{phase_id}:history"
+        pubsub = None
+
+        try:
+            history = r.lrange(history_key, 0, -1)
+            for msg in history:
+                yield f"data: {msg.decode()}\n\n"
+
+            pubsub = r.pubsub()
+            pubsub.subscribe(channel)
+
+            while True:
+                msg = pubsub.get_message(timeout=5.0)
+                if msg is None:
+                    yield ": keepalive\n\n"
+                    continue
+                if msg['type'] == 'message':
+                    data = json.loads(msg['data'])
+                    yield f"data: {msg['data'].decode()}\n\n"
+                    if data.get('type') == 'status':
+                        break
+        except GeneratorExit:
+            pass
+        except (SystemExit, KeyboardInterrupt):
+            pass
+        finally:
+            if pubsub:
+                pubsub.unsubscribe()
+                pubsub.close()
+            r.close()
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+        }
+    )

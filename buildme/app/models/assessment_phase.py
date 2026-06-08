@@ -12,6 +12,7 @@ class AssessmentPhase(db.Model):
     started_at = db.Column(db.DateTime, nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
     engine_id = db.Column(db.Integer, db.ForeignKey('engine.id'), nullable=True)
+    task_id = db.Column(db.String(80), nullable=True)
 
     assessment = db.relationship('Assessment', backref='phases')
     phase_definition = db.relationship('PhaseDefinition')

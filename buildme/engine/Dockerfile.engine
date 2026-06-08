@@ -17,6 +17,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     testssl.sh \
     netcat-openbsd \
     nuclei \
+    chkrootkit \
+    clamav \
+    dnsenum \
+    dnsrecon \
+    enum4linux \
+    hydra \
+    impacket-scripts \
+    lynis \
+    rkhunter \
+    smbclient \
+    wordlists \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -47,3 +47,9 @@ def mark_offline(engine_id):
 
 def get_all_engines():
     return Engine.query.order_by(Engine.registered_at.desc()).all()
+
+
+def find_any_online_engine():
+    return Engine.query.filter_by(status="online").order_by(
+        Engine.last_heartbeat_at.desc().nullslast()
+    ).first()

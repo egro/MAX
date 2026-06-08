@@ -263,3 +263,66 @@ table tr:last-child td {
     color: #dc3545;
     font-weight: 600;
 }
+
+#output-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+}
+
+.output-tab {
+    background: #e9ecef;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.output-tab.active {
+    background: #1a1a2e;
+    color: #fff;
+    border-color: #1a1a2e;
+}
+
+.output-tab:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#output-console {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid #333;
+    border-radius: 0 4px 4px 4px;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+#output-content {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 1rem;
+    margin: 0;
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.btn-run {
+    background: #28a745;
+}
+
+.btn-run:hover {
+    background: #218838;
+}
+
+.btn-run:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
