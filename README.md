@@ -6,18 +6,29 @@ MAX automates web application security assessments by orchestrating a fleet of K
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                       docker-compose.yml                        │
-│                                                                 │
+│                     Management Host                              │
 │  ┌───────────────────────┐      ┌───────────────────────────┐  │
-│  │         web            │      │       engine              │  │
-│  │  Flask + Gunicorn      │      │  Kali + Attack Tools     │  │
-│  │  python:3.12-slim     │      │  Celery Worker            │  │
-│  │                        │      │                           │  │
-│  │  PostgreSQL 16 (db)    │      │  Auto-registers on       │  │
-│  │  Redis 7 + auth       │      │  startup, sends heartbeat │  │
+│  │         web            │      │         db                │  │
+│  │  Flask + Gunicorn      │      │  PostgreSQL 16            │  │
+│  │  python:3.12-slim     │      └───────────────────────────┘  │
+│  │                        │      ┌───────────────────────────┐  │
+│  │                        │      │        redis              │  │
+│  │                        │      │  Redis 7 + auth           │  │
 │  └───────────────────────┘      └───────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      Engine Host(s)                             │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ engine                                                    │  │
+│  │  Kali Linux + Attack Tools (nmap, nikto, gobuster, ...)  │  │
+│  │  Celery Worker                                            │  │
+│  │  Auto-registers on startup, sends heartbeat               │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+Engines are deployed independently from the management stack and connect to the central web API, database, and Redis over the network.
 
 ## Services
 
@@ -30,30 +41,48 @@ MAX automates web application security assessments by orchestrating a fleet of K
 
 ## Quick Start
 
+### Management host (web + db + redis)
+
 ```bash
-cd buildme/docker
+cd buildme/webhost
 cp .env.example .env    # review and adjust secrets
 ./start.sh up -d --build
 ```
 
 > Use `./start.sh` instead of `docker compose` — it automatically detects the
 > host's IP addresses (excluding Docker bridge IPs) and passes them to the
-> engine container so the health dashboard shows the real host IPs.
+> engine containers so the health dashboard shows the real host IPs.
 
 Then open http://localhost:7077, register an account, and log in.
+
+### Engine host (standalone)
+
+```bash
+cd buildme/engine
+export DATABASE_URL=postgresql://user:pass@mgmt-host:5432/dbname
+export REDIS_URL=redis://:password@mgmt-host:6379/0
+export WEB_API_URL=http://mgmt-host:7077
+./start.sh up -d --build
+```
+
+`start.sh` validates that the three required vars are set before starting.
 
 ## Project Structure
 
 ```
 buildme/
-├── docker/
-│   ├── docker-compose.yml
+├── webhost/
+│   ├── docker-compose.yml      # Management stack: db, redis, web
 │   ├── Dockerfile.web
-│   ├── Dockerfile.engine
-│   ├── entrypoint.sh          # Engine auto-registration on startup
-│   ├── .env.example
+│   ├── start.sh                # Injects host IPs before docker compose
 │   ├── .env
-│   └── start.sh              # Injects host IPs before docker compose
+│   └── .env.example
+├── engine/
+│   ├── docker-compose.yml      # Engine-only, standalone
+│   ├── Dockerfile.engine
+│   ├── entrypoint.sh           # Engine auto-registration on startup
+│   ├── start.sh                # Validates required vars, injects host IPs
+│   └── .env.example
 ├── app/
 │   ├── __init__.py            # Flask app factory
 │   ├── config.py              # Configuration (DB, Redis, secrets)
@@ -101,18 +130,29 @@ buildme/
 
 ## Configuration
 
-Key environment variables in `.env`:
+### webhost `.env`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `WEB_PORT` | `7077` | Host port for the web UI |
 | `SECRET_KEY` | `changeme` | Flask session signing key |
-| `POSTGRES_DB` | `waa` | PostgreSQL database name |
-| `POSTGRES_PASSWORD` | `changeme` | PostgreSQL password |
-| `REDIS_PASSWORD` | `changeme` | Redis password |
+| `POSTGRES_DB` | `MaxAttack` | PostgreSQL database name |
+| `POSTGRES_USER` | `MaxAttack` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | `Postgres_Password_changeMe!` | PostgreSQL password |
+| `REDIS_PASSWORD` | `This-is-a-poor-Redis-password!` | Redis password |
 | `ENGINE_NAME` | `engine-default` | Unique name for the engine |
-| `ENGINE_NETWORK_TAG` | `default` | Network segment tag |
+| `ENGINE_NETWORK_TAG` | `engine-network-default` | Network segment tag |
+
+### engine — required env vars (no defaults, must be exported)
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string for the management host |
+| `REDIS_URL` | Redis connection string for the management host |
+| `WEB_API_URL` | Web API base URL (e.g. `http://mgmt-host:7077`) |
+
+Engine `.env.example` documents optional overrides (`ENGINE_NAME`, `ENGINE_NETWORK_TAG`) but the connection URLs must always be provided at runtime.
 
 ## Deployment Notes
 
-In production, **web**, **db**, and **redis** run on a central management host while **engine** containers run on separate hosts in their respective network segments. Engines connect to the central services via hostname/IP with firewall rules permitting outbound access. No code changes are needed.
+The management stack (**web**, **db**, **redis**) runs on a central host using `buildme/webhost/docker-compose.yml`. Engine containers run independently via `buildme/engine/docker-compose.yml` on separate hosts in their respective network segments. Engines connect to the central services via hostname/IP with firewall rules permitting outbound access. No code changes are needed.
