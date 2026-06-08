@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from app.config import Config
 from app.extensions import db, migrate, login_manager, celery
 from app.models.user import User
+from app.cli import init_cli
 from app.routes.auth import auth
 from app.routes.engines import engines
 
@@ -42,5 +43,7 @@ def create_app(config_class=Config):
     @app.route('/')
     def index():
         return render_template('base.html')
+
+    init_cli(app)
 
     return app

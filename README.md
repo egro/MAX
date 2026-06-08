@@ -1,6 +1,6 @@
-# MAX — Web Application Assessment Platform
+# MAX — Security Assessment Platform
 
-MAX automates web application security assessments by orchestrating a fleet of Kali-based engine containers. Assessments are broken into sequential phases (recon, SSL, enumeration, vulnerability testing, auth testing, extras), with findings captured and mapped to frameworks like OWASP Top 10, NIST SP 800-53, CWE, and SANS Top 25.
+MAX automates security assessments by orchestrating a fleet of Kali-based engine containers. Assessments are broken into user-selectable phases covering both web application and host-level analysis (recon, SSL, enumeration, vulnerability testing, credential testing, compliance auditing, malware scanning, etc.), with findings captured and mapped to frameworks like OWASP Top 10, NIST SP 800-53, CWE, and SANS Top 25.
 
 ## Architecture
 
@@ -55,6 +55,12 @@ cp .env.example .env    # review and adjust secrets
 
 Then open http://localhost:7077, register an account, and log in.
 
+The first account registered is a regular `user`. To promote it to `admin` (needed for managing phase definitions), run:
+
+```bash
+docker compose exec web flask set-role <username> admin
+```
+
 ### Engine host (standalone)
 
 ```bash
@@ -84,11 +90,12 @@ buildme/
 │   ├── start.sh                # Validates required vars, injects host IPs
 │   └── .env.example
 ├── app/
-│   ├── __init__.py            # Flask app factory
+│   ├── __init__.py            # Flask app factory, CLI init
+│   ├── cli.py                 # Flask CLI commands (set-role, list-users)
 │   ├── config.py              # Configuration (DB, Redis, secrets)
 │   ├── extensions.py          # db, migrate, login_manager, celery
 │   ├── models/
-│   │   ├── user.py            # User (registration, auth)
+│   │   ├── user.py            # User (registration, auth, roles)
 │   │   └── engine.py          # Engine registration, heartbeat
 │   ├── routes/
 │   │   ├── auth.py            # Login, logout, register
@@ -113,9 +120,9 @@ buildme/
 | A | Docker & Foundation | Done |
 | B | Auth & User Model | Done |
 | C | Engine Registration + Health | Done |
-| D | Assessment CRUD + DB Schema | Not started |
+| D | Assessment + PhaseDefinition CRUD | Not started |
 | E | Celery Task Framework + Live Output | Not started |
-| F | Phase Tasks (Tool Orchestration) | Not started |
+| F | Tool Installation & Engine Readiness | Not started |
 | G | Findings Management | Not started |
 | H | Report Generation | Not started |
 | I | API Layer | Not started |
@@ -152,6 +159,35 @@ buildme/
 | `WEB_API_URL` | Web API base URL (e.g. `http://mgmt-host:7077`) |
 
 Engine `.env.example` documents optional overrides (`ENGINE_NAME`, `ENGINE_NETWORK_TAG`) but the connection URLs must always be provided at runtime.
+
+## User Roles
+
+MAX has two roles:
+
+| Role | Permissions |
+|------|-------------|
+| `user` | Create assessments, select phases from the catalog, view results |
+| `admin` | Everything a `user` can do, plus create/edit/delete phase definitions (including command templates) |
+
+### Changing roles
+
+Use the `set-role` Flask CLI command from the web container:
+
+```bash
+# Promote a user to admin
+docker compose exec web flask set-role alice admin
+
+# Demote an admin back to user
+docker compose exec web flask set-role alice user
+```
+
+List all users and their roles:
+
+```bash
+docker compose exec web flask list-users
+```
+
+The first account registered defaults to `user`. An admin must promote it before that account can manage phase definitions.
 
 ## Deployment Notes
 
