@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Assessments{% endblock %}
+{% block content %}
+<h2>Assessments</h2>
+<a href="{{ url_for('assessments.new') }}" class="btn">New Assessment</a>
+
+{% if assessments %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Target</th>
+      <th>Status</th>
+      <th>Created</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in assessments %}
+    <tr>
+      <td><a href="{{ url_for('assessments.detail', id=a.id) }}">{{ a.name }}</a></td>
+      <td><code>{{ a.target }}</code></td>
+      <td class="status-{{ a.status }}">{{ a.status }}</td>
+      <td>{{ a.created_at | datetime }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('assessments.delete', id=a.id) }}" style="display:inline">
+          <button type="submit" class="btn-small btn-danger"
+                  onclick="return confirm('Delete this assessment?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No assessments yet. <a href="{{ url_for('assessments.new') }}">Create one</a>.</p>
+{% endif %}
+{% endblock %}

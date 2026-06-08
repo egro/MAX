@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Phase Definitions{% endblock %}
+{% block content %}
+<h2>Phase Definitions</h2>
+{% if current_user.role == 'admin' %}
+<a href="{{ url_for('phase_defs.new') }}" class="btn">New Phase Definition</a>
+{% endif %}
+
+{% if definitions %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Label</th>
+      <th>Category</th>
+      <th>Description</th>
+      <th>Tools</th>
+      {% if current_user.role == 'admin' %}<th></th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in definitions %}
+    <tr>
+      <td><code>{{ d.name }}</code></td>
+      <td>{{ d.label }}</td>
+      <td><span class="badge-{{ d.category }}">{{ d.category }}</span></td>
+      <td>{{ d.description or '--' }}</td>
+      <td>{% if d.suggested_tools %}<code>{{ d.suggested_tools | join(', ') }}</code>{% else %}--{% endif %}</td>
+      {% if current_user.role == 'admin' %}
+      <td>
+        <a href="{{ url_for('phase_defs.edit', id=d.id) }}" class="btn-small">Edit</a>
+        <form method="POST" action="{{ url_for('phase_defs.delete', id=d.id) }}" style="display:inline">
+          <button type="submit" class="btn-small btn-danger"
+                  onclick="return confirm('Delete phase definition {{ d.label | e }}?')">Delete</button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No phase definitions yet.</p>
+{% endif %}
+{% endblock %}

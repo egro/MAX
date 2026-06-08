@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAA Platform</title>
+    <title>MAX — Security Assessment Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
     <header>
         <nav>
-            <a href="/" class="logo">Max</a>
+            <a href="/" class="logo">MAX</a>
             <div class="nav-links">
                 {% if current_user.is_authenticated %}
-                    <span>{{ current_user.username }}</span>
+                    <a href="{{ url_for('assessments.list_view') }}">Assessments</a>
+                    <a href="{{ url_for('engines.list_engines') }}">Engine Health</a>
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('phase_defs.list_view') }}">Phase Definitions</a>
+                    {% endif %}
+                    <span class="nav-user">{{ current_user.username }}</span>
+                    {% if current_user.role == 'admin' %}<span class="badge-admin">admin</span>{% endif %}
                     <a href="{{ url_for('auth.logout') }}">Log out</a>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}">Log in</a>

@@ -5,6 +5,9 @@ from app.models.user import User
 from app.cli import init_cli
 from app.routes.auth import auth
 from app.routes.engines import engines
+from app.routes.assessments import assessments
+from app.routes.phase_definitions import phase_defs
+from app.services.seed_data import seed_default_phases
 
 
 def create_app(config_class=Config):
@@ -16,6 +19,8 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     app.register_blueprint(auth)
     app.register_blueprint(engines)
+    app.register_blueprint(assessments)
+    app.register_blueprint(phase_defs)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -35,6 +40,7 @@ def create_app(config_class=Config):
 
     with app.app_context():
         db.create_all()
+        seed_default_phases()
 
     @app.template_filter('datetime')
     def format_datetime(value):

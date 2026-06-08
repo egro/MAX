@@ -93,21 +93,36 @@ buildme/
 │   ├── __init__.py            # Flask app factory, CLI init
 │   ├── cli.py                 # Flask CLI commands (set-role, list-users)
 │   ├── config.py              # Configuration (DB, Redis, secrets)
+│   ├── decorators.py          # @admin_required decorator
 │   ├── extensions.py          # db, migrate, login_manager, celery
 │   ├── models/
 │   │   ├── user.py            # User (registration, auth, roles)
-│   │   └── engine.py          # Engine registration, heartbeat
+│   │   ├── engine.py          # Engine registration, heartbeat
+│   │   ├── phase_definition.py # Phase catalog with command templates
+│   │   ├── assessment.py      # Assessment model (target, status)
+│   │   └── assessment_phase.py # Phase instance within an assessment
 │   ├── routes/
 │   │   ├── auth.py            # Login, logout, register
-│   │   └── engines.py         # Engine API + health dashboard
+│   │   ├── engines.py         # Engine API + health dashboard
+│   │   ├── assessments.py     # Assessment CRUD with phase picker
+│   │   └── phase_definitions.py # Phase definition CRUD (admin)
 │   ├── services/
-│   │   └── engine_registry.py # Online engine selection
+│   │   ├── engine_registry.py # Online engine selection
+│   │   └── seed_data.py       # Default phase definition seeding
 │   ├── tasks/
 │   │   └── heartbeat.py       # Celery heartbeat task
 │   ├── templates/
 │   │   ├── base.html
 │   │   ├── auth/ (login, register)
-│   │   └── engines/list.html  # Health dashboard
+│   │   ├── engines/
+│   │   │   └── list.html
+│   │   ├── assessments/
+│   │   │   ├── list.html
+│   │   │   ├── new.html
+│   │   │   └── detail.html
+│   │   └── phase_definitions/
+│   │       ├── list.html
+│   │       └── edit.html
 │   └── static/css/app.css
 ├── requirements.txt
 └── PLAN.md
@@ -120,7 +135,7 @@ buildme/
 | A | Docker & Foundation | Done |
 | B | Auth & User Model | Done |
 | C | Engine Registration + Health | Done |
-| D | Assessment + PhaseDefinition CRUD | Not started |
+| D | Assessment + PhaseDefinition CRUD | Done |
 | E | Celery Task Framework + Live Output | Not started |
 | F | Tool Installation & Engine Readiness | Not started |
 | G | Findings Management | Not started |

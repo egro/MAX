@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ assessment.name }}{% endblock %}
+{% block content %}
+<h2>{{ assessment.name }}</h2>
+
+<table>
+  <tr><th>Target</th><td><code>{{ assessment.target }}</code></td></tr>
+  <tr><th>Status</th><td class="status-{{ assessment.status }}">{{ assessment.status }}</td></tr>
+  <tr><th>Created</th><td>{{ assessment.created_at | datetime }}</td></tr>
+  <tr><th>Updated</th><td>{{ assessment.updated_at | datetime }}</td></tr>
+</table>
+
+<h3>Phases</h3>
+{% if phases %}
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Phase</th>
+      <th>Category</th>
+      <th>Status</th>
+      <th>Started</th>
+      <th>Completed</th>
+      <th>Engine</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in phases %}
+    <tr>
+      <td>{{ p.order + 1 }}</td>
+      <td>{{ p.phase_definition.label }}</td>
+      <td><span class="badge-{{ p.phase_definition.category }}">{{ p.phase_definition.category }}</span></td>
+      <td class="status-{{ p.status }}">{{ p.status }}</td>
+      <td>{{ p.started_at | datetime if p.started_at else '--' }}</td>
+      <td>{{ p.completed_at | datetime if p.completed_at else '--' }}</td>
+      <td>{{ p.engine.name if p.engine else '--' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No phases configured.</p>
+{% endif %}
+
+<p>
+  <a href="{{ url_for('assessments.list_view') }}" class="btn">Back to Assessments</a>
+  <form method="POST" action="{{ url_for('assessments.delete', id=assessment.id) }}" style="display:inline">
+    <button type="submit" class="btn-small btn-danger"
+            onclick="return confirm('Delete this assessment?')">Delete</button>
+  </form>
+</p>
+{% endblock %}

@@ -49,6 +49,134 @@ header nav .nav-links a:hover {
     text-decoration: underline;
 }
 
+header nav .nav-links .nav-user {
+    color: #8f8f9e;
+}
+
+.btn, form button, a.btn {
+    display: inline-block;
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn:hover, form button:hover, a.btn:hover {
+    background: #16213e;
+}
+
+.btn-small {
+    display: inline-block;
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.status-created { color: #6c757d; font-weight: 600; }
+.status-running { color: #007bff; font-weight: 600; }
+.status-pending { color: #6c757d; font-weight: 600; }
+.status-completed { color: #28a745; font-weight: 600; }
+.status-failed { color: #dc3545; font-weight: 600; }
+
+.status-online { color: #28a745; font-weight: 600; }
+.status-offline { color: #dc3545; font-weight: 600; }
+
+.badge-web { background: #17a2b8; color: #fff; padding: 0.1rem 0.5rem; border-radius: 3px; font-size: 0.75rem; }
+.badge-host { background: #6f42c1; color: #fff; padding: 0.1rem 0.5rem; border-radius: 3px; font-size: 0.75rem; }
+.badge-admin { background: #e67e22; color: #fff; padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.7rem; font-weight: 600; }
+
+.phase-category { margin-left: 0.5rem; }
+
+fieldset {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #fff;
+}
+
+legend {
+    font-weight: 600;
+    padding: 0 0.5rem;
+}
+
+#phase-list {
+    list-style: none;
+    padding: 0;
+}
+
+#phase-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: grab;
+}
+
+#phase-list li:active {
+    cursor: grabbing;
+}
+
+#phase-list li.dragging {
+    opacity: 0.5;
+}
+
+.drag-handle {
+    color: #aaa;
+    font-size: 1.1rem;
+    cursor: grab;
+    user-select: none;
+}
+
+#phase-list li label {
+    flex: 1;
+    cursor: grab;
+}
+
+#phase-list li label input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+textarea {
+    width: 100%;
+    max-width: 600px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+select {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
 main {
     max-width: 1200px;
     margin: 2rem auto;

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}New Assessment{% endblock %}
+{% block content %}
+<h2>New Assessment</h2>
+
+<form method="POST">
+  <div>
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" required>
+  </div>
+
+  <div>
+    <label for="target">Target</label>
+    <input type="text" id="target" name="target" required
+           placeholder="Hostname, IP, URL, or CIDR range">
+  </div>
+
+  <fieldset>
+    <legend>Phases <small>(drag to reorder)</small></legend>
+    <ul id="phase-list">
+      {% for phase in phase_defs %}
+      <li data-id="{{ phase.id }}" class="phase-item">
+        <span class="drag-handle">&#9776;</span>
+        <label>
+          <input type="checkbox" name="phase_ids" value="{{ phase.id }}" checked>
+          <strong>{{ phase.label }}</strong>
+          <span class="phase-category badge-{{ phase.category }}">{{ phase.category }}</span>
+          <br>
+          <small>{{ phase.description }}</small>
+        </label>
+      </li>
+      {% endfor %}
+    </ul>
+  </fieldset>
+
+  <input type="hidden" name="phase_order" id="phase-order">
+
+  <button type="submit" class="btn">Create Assessment</button>
+</form>
+
+<script>
+(function() {
+  var list = document.getElementById('phase-list');
+  var orderInput = document.getElementById('phase-order');
+
+  function updateOrder() {
+    var items = list.querySelectorAll('[data-id]');
+    var ids = Array.from(items).map(function(el) { return el.dataset.id; });
+    orderInput.value = ids.join(',');
+  }
+
+  var dragSrc = null;
+
+  list.addEventListener('dragstart', function(e) {
+    dragSrc = e.target.closest('[data-id]');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+  });
+
+  list.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    var target = e.target.closest('[data-id]');
+    if (target && target !== dragSrc) {
+      var rect = target.getBoundingClientRect();
+      var mid = rect.top + rect.height / 2;
+      if (e.clientY < mid) {
+        list.insertBefore(dragSrc, target);
+      } else {
+        list.insertBefore(dragSrc, target.nextSibling);
+      }
+      updateOrder();
+    }
+  });
+
+  list.addEventListener('dragend', function() {
+    dragSrc = null;
+  });
+
+  list.querySelectorAll('[data-id]').forEach(function(item) {
+    item.draggable = true;
+  });
+
+  updateOrder();
+})();
+</script>
+{% endblock %}

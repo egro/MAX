@@ -81,7 +81,7 @@ Shipped with the app and stored in the DB. Users with `admin` role can create/ed
 | **A:** Docker & Foundation | `[DONE]` |
 | **B:** Auth & User Model | `[DONE]` |
 | **C:** Engine Registration + Health | `[DONE]` |
-| **D:** Assessment + PhaseDefinition CRUD | `[NOT STARTED]` |
+| **D:** Assessment + PhaseDefinition CRUD | `[DONE]` |
 | **E:** Celery Task Framework + Live Output | `[NOT STARTED]` |
 | **F:** Tool Installation & Engine Readiness | `[NOT STARTED]` |
 | **G:** Findings Management | `[NOT STARTED]` |
@@ -196,19 +196,19 @@ buildme/
 
 ---
 
-## Phase D: Assessment + PhaseDefinition CRUD `[NOT STARTED]`
+## Phase D: Assessment + PhaseDefinition CRUD `[DONE]`
 
-- [ ] `app/models/phase_definition.py` — PhaseDefinition model (name, label, category, description, command_template, suggested_tools, created_by, timestamps)
-- [ ] `app/services/seed_data.py` — Seed default phase definitions on first deploy
-- [ ] `app/models/assessment.py` — Assessment model (id, name, target (Text, free-form), status, created_by, created_at, updated_at)
-- [ ] `app/models/assessment_phase.py` — AssessmentPhase model (id, assessment_id FK, phase_definition_id FK, status, order, started_at, completed_at, engine_id FK)
-- [ ] `app/routes/assessments.py` — list, create (phase selection UI), detail routes
-- [ ] `app/routes/phase_definitions.py` — CRUD for phase definitions (admin-only)
-- [ ] `app/templates/assessments/list.html`
-- [ ] `app/templates/assessments/new.html` — target input + phase checklist from catalog
-- [ ] `app/templates/assessments/detail.html` — phase list with status, run buttons
-- [ ] `app/templates/phase_definitions/list.html`
-- [ ] `app/templates/phase_definitions/edit.html` — command_template editor
+- [x] `app/models/phase_definition.py` — PhaseDefinition model (name, label, category, description, command_template, suggested_tools, created_by, timestamps)
+- [x] `app/services/seed_data.py` — Seed default phase definitions on first deploy
+- [x] `app/models/assessment.py` — Assessment model (id, name, target (Text, free-form), status, created_by, created_at, updated_at)
+- [x] `app/models/assessment_phase.py` — AssessmentPhase model (id, assessment_id FK, phase_definition_id FK, status, order, started_at, completed_at, engine_id FK)
+- [x] `app/routes/assessments.py` — list, create (phase selection UI with drag-to-reorder), detail routes
+- [x] `app/routes/phase_definitions.py` — CRUD for phase definitions (admin-only)
+- [x] `app/templates/assessments/list.html`
+- [x] `app/templates/assessments/new.html` — target input + phase checklist from catalog
+- [x] `app/templates/assessments/detail.html` — phase list with status, run buttons
+- [x] `app/templates/phase_definitions/list.html`
+- [x] `app/templates/phase_definitions/edit.html` — command_template editor
 
 ---
 

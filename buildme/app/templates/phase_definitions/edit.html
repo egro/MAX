@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{% if phase %}Edit{% else %}New{% endif %} Phase Definition{% endblock %}
+{% block content %}
+<h2>{% if phase %}Edit{% else %}New{% endif %} Phase Definition</h2>
+
+<form method="POST">
+  <div>
+    <label for="name">Name (slug)</label>
+    <input type="text" id="name" name="name" value="{{ phase.name if phase else '' }}"
+           {% if phase %}readonly{% endif %} required>
+  </div>
+
+  <div>
+    <label for="label">Label</label>
+    <input type="text" id="label" name="label" value="{{ phase.label if phase else '' }}" required>
+  </div>
+
+  <div>
+    <label for="category">Category</label>
+    <select id="category" name="category" required>
+      <option value="web" {% if phase and phase.category == 'web' %}selected{% endif %}>Web</option>
+      <option value="host" {% if phase and phase.category == 'host' %}selected{% endif %}>Host</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="2">{{ phase.description if phase else '' }}</textarea>
+  </div>
+
+  <div>
+    <label for="command_template">Command Template</label>
+    <textarea id="command_template" name="command_template" rows="6" required
+              placeholder="e.g. nmap -sV -sC -O -p- {target} 2>&1">{{ phase.command_template if phase else '' }}</textarea>
+    <small>Use <code>{target}</code> as placeholder for the assessment target. Output will be captured.</small>
+  </div>
+
+  <div>
+    <label for="suggested_tools">Suggested Tools (comma-separated)</label>
+    <input type="text" id="suggested_tools" name="suggested_tools"
+           value="{{ phase.suggested_tools | join(', ') if phase and phase.suggested_tools else '' }}"
+           placeholder="nmap, nuclei, hydra">
+  </div>
+
+  <button type="submit" class="btn">{% if phase %}Update{% else %}Create{% endif %}</button>
+  <a href="{{ url_for('phase_defs.list_view') }}" class="btn">Cancel</a>
+</form>
+{% endblock %}
