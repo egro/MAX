@@ -1,0 +1,15 @@
+services:
+  engine:
+    build:
+      context: ..
+      dockerfile: engine/Dockerfile.engine
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      ENGINE_NAME: ${ENGINE_NAME:-engine-default}
+      ENGINE_NETWORK_TAG: ${ENGINE_NETWORK_TAG:-default}
+      WEB_API_URL: ${WEB_API_URL}
+      HOST_IP: ${HOST_IP}
+    restart: unless-stopped

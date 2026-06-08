@@ -33,9 +33,12 @@ MAX automates web application security assessments by orchestrating a fleet of K
 ```bash
 cd buildme/docker
 cp .env.example .env    # review and adjust secrets
-docker compose build
-docker compose up -d
+./start.sh up -d --build
 ```
+
+> Use `./start.sh` instead of `docker compose` — it automatically detects the
+> host's IP addresses (excluding Docker bridge IPs) and passes them to the
+> engine container so the health dashboard shows the real host IPs.
 
 Then open http://localhost:7077, register an account, and log in.
 
@@ -49,7 +52,8 @@ buildme/
 │   ├── Dockerfile.engine
 │   ├── entrypoint.sh          # Engine auto-registration on startup
 │   ├── .env.example
-│   └── .env
+│   ├── .env
+│   └── start.sh              # Injects host IPs before docker compose
 ├── app/
 │   ├── __init__.py            # Flask app factory
 │   ├── config.py              # Configuration (DB, Redis, secrets)
@@ -108,7 +112,6 @@ Key environment variables in `.env`:
 | `REDIS_PASSWORD` | `changeme` | Redis password |
 | `ENGINE_NAME` | `engine-default` | Unique name for the engine |
 | `ENGINE_NETWORK_TAG` | `default` | Network segment tag |
-| `HOST_IP` | _(auto-detected)_ | Host IP for engine registration |
 
 ## Deployment Notes
 

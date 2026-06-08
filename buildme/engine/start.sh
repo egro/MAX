@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+
+: "${DATABASE_URL:?Must set DATABASE_URL}"
+: "${REDIS_URL:?Must set REDIS_URL}"
+: "${WEB_API_URL:?Must set WEB_API_URL}"
+
+HOST_IP=$(hostname -I | xargs -n1 | grep -v '^172\.1[6-9]\.' | grep -v '^172\.2[0-9]\.' | grep -v '^172\.3[0-1]\.' | xargs | tr ' ' ',')
+export HOST_IP
+
+exec docker compose "$@"

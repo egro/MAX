@@ -19,7 +19,7 @@
         <tr>
             <td>{{ engine.name }}</td>
             <td>{{ engine.network_tag }}</td>
-            <td>{{ engine.ip }}</td>
+            <td>{{ engine.ip.replace(',', ', ') }}</td>
             <td class="status-{{ engine.status }}">{{ engine.status }}</td>
             <td>{{ engine.last_heartbeat_at | datetime if engine.last_heartbeat_at else '—' }}</td>
             <td>{{ engine.registered_at | datetime }}</td>
