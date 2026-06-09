@@ -7,6 +7,10 @@ class Config:
         'DATABASE_URL', 'postgresql://waa:changeme@localhost:5432/waa'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+    }
 
     REDIS_URL = os.environ.get('REDIS_URL', 'redis://:changeme@localhost:6379/0')
     CELERY_BROKER_URL = REDIS_URL

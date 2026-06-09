@@ -4,6 +4,23 @@ from app.models.finding import Finding
 from app.services.llm_service import is_configured, extract_findings_via_llm
 
 
+def _match_credential_finding(line, line_lower):
+    if 'password' not in line_lower:
+        return False
+    if 'found' not in line_lower and 'login' not in line_lower:
+        return False
+    if 'no password' in line_lower or 'password not found' in line_lower:
+        return False
+    if 'unresponsive' in line_lower or 'port closed' in line_lower or 'refused' in line_lower:
+        return False
+    words = set(re.findall(r'[a-zA-Z]+', line_lower))
+    has_password_word = 'password' in words
+    if not has_password_word:
+        return False
+    has_found_or_login = 'found' in words or 'login' in words
+    return has_found_or_login
+
+
 def extract_findings_from_output(assessment_id, phase_id, output_lines):
     lines = list(output_lines) if output_lines else []
     if not lines:
@@ -48,7 +65,7 @@ def extract_findings_from_output(assessment_id, phase_id, output_lines):
                 status='open',
             )
 
-        if not finding and ('password' in line_lower and ('found' in line_lower or 'login' in line_lower)):
+        if not finding and _match_credential_finding(line, line_lower):
             finding = Finding(
                 title=f'Credential Found: {line.strip()[:150]}',
                 severity='critical',

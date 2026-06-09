@@ -67,7 +67,11 @@ def run_phase_task(self, assessment_id, phase_id):
         return {"status": ap.status}
 
     except Exception as e:
-        db.session.rollback()
+        try:
+            db.session.rollback()
+        except Exception:
+            db.session.remove()
+            db.engine.dispose()
         try:
             ap = db.session.get(AssessmentPhase, phase_id)
             if ap and ap.status == "running":
@@ -75,5 +79,6 @@ def run_phase_task(self, assessment_id, phase_id):
                 ap.completed_at = datetime.now(timezone.utc)
                 db.session.commit()
         except Exception:
-            db.session.rollback()
+            db.session.remove()
+            db.engine.dispose()
         return {"status": "failed", "error": str(e)}

@@ -106,6 +106,16 @@ def delete(id):
         flash('You do not have permission to delete this assessment.')
         return redirect(url_for('assessments.list_view'))
 
+    from app.extensions import celery
+    from app.models.finding import Finding
+    running = AssessmentPhase.query.filter_by(assessment_id=id, status='running').all()
+    for ap in running:
+        if ap.task_id:
+            celery.control.revoke(ap.task_id, terminate=True)
+
+    phase_ids = [p.id for p in AssessmentPhase.query.with_entities(AssessmentPhase.id).filter_by(assessment_id=id).all()]
+    if phase_ids:
+        Finding.query.filter(Finding.assessment_phase_id.in_(phase_ids)).delete(synchronize_session=False)
     AssessmentPhase.query.filter_by(assessment_id=id).delete()
     db.session.delete(assessment)
     db.session.commit()

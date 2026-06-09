@@ -11,6 +11,8 @@ def run_command(command_template, target, assessment_id, phase_id, redis_url):
     command = command_template.replace("{target}", target)
     success = False
 
+    output_count = 0
+
     try:
         proc = subprocess.Popen(
             command,
@@ -26,17 +28,28 @@ def run_command(command_template, target, assessment_id, phase_id, redis_url):
             r.publish(channel, msg)
             r.rpush(history_key, msg)
             r.expire(history_key, 3600)
+            output_count += 1
 
         proc.stdout.close()
         proc.wait()
 
         if proc.returncode == 0:
+            if output_count == 0:
+                line = json.dumps({"type": "output", "line": "[command completed with no output]"})
+                r.publish(channel, line)
+                r.rpush(history_key, line)
+                r.expire(history_key, 3600)
             msg = json.dumps({"type": "status", "status": "completed"})
             r.publish(channel, msg)
             r.rpush(history_key, msg)
             r.expire(history_key, 3600)
             success = True
         else:
+            if output_count == 0:
+                line = json.dumps({"type": "output", "line": f"[command failed with exit code {proc.returncode}]"})
+                r.publish(channel, line)
+                r.rpush(history_key, line)
+                r.expire(history_key, 3600)
             msg = json.dumps(
                 {
                     "type": "status",
@@ -48,6 +61,11 @@ def run_command(command_template, target, assessment_id, phase_id, redis_url):
             r.rpush(history_key, msg)
             r.expire(history_key, 3600)
     except Exception as e:
+        if output_count == 0:
+            line = json.dumps({"type": "output", "line": f"[error: {e}]"})
+            r.publish(channel, line)
+            r.rpush(history_key, line)
+            r.expire(history_key, 3600)
         msg = json.dumps({"type": "status", "status": "failed", "error": str(e)})
         r.publish(channel, msg)
         r.rpush(history_key, msg)
