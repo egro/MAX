@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Findings by Assessment{% endblock %}
+{% block content %}
+<h2>Findings by Assessment</h2>
+
+{% if rows %}
+<table>
+  <thead>
+    <tr>
+      <th>Assessment</th>
+      <th>Target</th>
+      <th>Critical</th>
+      <th>High</th>
+      <th>Medium</th>
+      <th>Low</th>
+      <th>Info</th>
+      <th>Total</th>
+      <th>Latest Finding</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td><a href="{{ url_for('assessments.detail', id=r.assessment.id) }}">{{ r.assessment.name }}</a></td>
+      <td><code>{{ r.assessment.target }}</code></td>
+      <td>{% if r.critical %}<span class="severity-critical">{{ r.critical }}</span>{% else %}0{% endif %}</td>
+      <td>{% if r.high %}<span class="severity-high">{{ r.high }}</span>{% else %}0{% endif %}</td>
+      <td>{% if r.medium %}<span class="severity-medium">{{ r.medium }}</span>{% else %}0{% endif %}</td>
+      <td>{% if r.low %}<span class="severity-low">{{ r.low }}</span>{% else %}0{% endif %}</td>
+      <td>{% if r.info %}<span class="severity-info">{{ r.info }}</span>{% else %}0{% endif %}</td>
+      <td><strong>{{ r.total }}</strong></td>
+      <td>{{ r.latest_finding_at | datetime if r.latest_finding_at else '--' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No assessments with findings yet. Findings are automatically extracted from tool output when a phase completes.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>MAX · Brand Pitch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --bg-2: #0d1218;
+      --bg-3: #101620;
+      --border: #1c2330;
+      --ink: #e5edf7;
+      --ink-2: #cdd6e2;
+      --muted: #7d8aa1;
+      --faint: #5a6479;
+      --teal: #00D4CC;
+      --blue: #0066FF;
+      --grad: linear-gradient(135deg, #00D4CC 0%, #0066FF 100%);
+    }
+    html, body { margin: 0; padding: 0; background: #050810; color: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    deck-stage:not(:defined) { visibility: hidden; }
+    deck-stage { background: var(--bg); }
+
+    /* Common slide chrome */
+    section {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Brand mark — reusable inline */
+    .vmark { display: inline-block; vertical-align: middle; }
+    .vmark svg { display: block; }
+
+    /* Wordmark */
+    .word {
+      font-family: 'Geist', 'Inter', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.32em;
+      color: var(--ink);
+    }
+    .gradient-text {
+      background: var(--grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .eyebrow {
+      font-family: 'Geist Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.3em;
+      color: var(--teal);
+      text-transform: uppercase;
+    }
+    .lede {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    /* Background ornaments */
+    .ornament-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,204,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,204,0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 80%);
+      pointer-events: none;
+    }
+    .ornament-glow {
+      position: absolute;
+      width: 1200px; height: 1200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,102,255,0.18) 0%, rgba(0,212,204,0.08) 30%, transparent 65%);
+      filter: blur(60px);
+      pointer-events: none;
+    }
+    .slide-num {
+      position: absolute; bottom: 38px; right: 60px;
+      font-family: 'Geist Mono', monospace; font-size: 12px;
+      color: var(--faint); letter-spacing: 0.2em;
+    }
+    .slide-brand {
+      position: absolute; bottom: 38px; left: 60px;
+      font-family: 'Geist Mono', monospace; font-size: 12px;
+      color: var(--faint); letter-spacing: 0.3em;
+      display: flex; align-items: center; gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Reusable brand mark SVG (defined once, referenced via <use>) -->
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+  <defs>
+    <linearGradient id="vmg" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00D4CC" />
+      <stop offset="100%" stop-color="#0066FF" />
+    </linearGradient>
+    <symbol id="vmark" viewBox="0 0 500 500">
+      <path d="M113.10,386.90 L250.00,113.10 L386.90,386.90 L250.00,250.00 Z" fill="url(#vmg)" />
+      <line x1="113.10" y1="386.90" x2="250.00" y2="113.10" stroke="rgba(255,255,255,0.22)" stroke-width="6" />
+      <line x1="250.00" y1="179.70" x2="250.00" y2="264.80" stroke="rgba(255,255,255,0.10)" stroke-width="3" />
+    </symbol>
+  </defs>
+</svg>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 01 · COVER
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Cover">
+    <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 60%, #0e1828 0%, #0a0e14 50%, #06080e 100%);"></div>
+    <div class="ornament-grid"></div>
+    <div class="ornament-glow" style="top: -300px; left: 50%; transform: translateX(-50%);"></div>
+
+    <!-- Mark + wordmark, centered -->
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px;">
+      <svg class="vmark" width="260" height="260"><use href="#vmark" /></svg>
+      <div class="word" style="font-size: 96px; line-height: 1;">MAX</div>
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.32em; line-height: 1; max-width: 1100px; text-align: center;">
+        VULNERABILITY <span style="color: var(--faint);">and</span> ADVERSARIAL · NETWORK · TESTING · ANALYSIS · GUIDANCE · ENGINE
+      </div>
+      <div style="width: 280px; height: 1px; background: linear-gradient(90deg, transparent, var(--teal), transparent);"></div>
+      <div class="lede" style="font-size: 32px; color: var(--teal); letter-spacing: 0.02em;">Where threats come into focus.</div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX · BRAND PITCH
+    </div>
+    <div class="slide-num">01 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 02 · WHY THE NAME
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="The Name">
+    <div class="ornament-grid"></div>
+
+    <!-- Eyebrow + title -->
+    <div style="position: absolute; top: 90px; left: 110px;">
+      <div class="eyebrow">01 — The Name</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 64px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 16px; max-width: 1400px;">
+        A <span class="gradient-text">vantage</span> is a position of strategic advantage.
+      </div>
+      <div style="font-size: 22px; color: var(--ink-2); margin-top: 20px; max-width: 1400px; line-height: 1.5;">
+        Pentesting is about seeing what defenders can't. The operator with a clear vantage acts before the attacker does.
+      </div>
+    </div>
+
+    <!-- Acronym breakdown -->
+    <div style="position: absolute; top: 460px; left: 110px; right: 110px;">
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 22px;">
+        <div style="flex: 0 0 auto; width: 24px; height: 1px; background: var(--teal);"></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--teal); letter-spacing: 0.25em;">AND THE ACRONYM STANDS FOR</div>
+        <div style="flex: 1; height: 1px; background: linear-gradient(90deg, var(--teal), transparent);"></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px;">
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">V</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Vulnerability</div>
+        </div>
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">A</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Adversarial</div>
+          <div style="font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'Geist Mono', monospace; letter-spacing: 0.1em;">+ and</div>
+        </div>
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">N</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Network</div>
+        </div>
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">T</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Testing</div>
+        </div>
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">A</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Analysis</div>
+        </div>
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">G</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Guidance</div>
+        </div>
+        <div style="padding: 24px 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; text-align: center;">
+          <div class="gradient-text" style="font-family: 'Geist', sans-serif; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.02em;">E</div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); margin-top: 18px;">Engine</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 32px;">
+        <div style="font-family: 'Geist', sans-serif; font-size: 24px; color: var(--ink); letter-spacing: 0.01em; line-height: 1.4;">
+          <span class="gradient-text" style="font-weight: 700;">Vulnerability</span> and
+          <span class="gradient-text" style="font-weight: 700;">Adversarial</span>
+          <span class="gradient-text" style="font-weight: 700;">Network</span>
+          <span class="gradient-text" style="font-weight: 700;">Testing</span>,
+          <span class="gradient-text" style="font-weight: 700;">Analysis</span>,
+          <span class="gradient-text" style="font-weight: 700;">Guidance</span>
+          <span class="gradient-text" style="font-weight: 700;">Engine</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">02 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 03 · POSITION
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Position">
+    <div class="ornament-grid"></div>
+    <div class="ornament-glow" style="top: -400px; right: -300px;"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px; right: 110px;">
+      <div class="eyebrow">02 — Position</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        We are the workspace<br />for the <span class="gradient-text">operator-in-the-loop</span>.
+      </div>
+    </div>
+
+    <!-- Two columns: WE ARE / WE ARE NOT -->
+    <div style="position: absolute; bottom: 160px; left: 110px; right: 110px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
+      <div style="padding: 36px; background: rgba(0,212,204,0.06); border: 1px solid rgba(0,212,204,0.35); border-radius: 12px;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 18px;">+  MAX IS</div>
+        <ul style="margin: 0; padding: 0; list-style: none; font-size: 22px; line-height: 1.7; color: var(--ink);">
+          <li style="padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">An engagement-scoped workspace</li>
+          <li style="padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">An assistant the operator commands</li>
+          <li style="padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">A methodology, made executable</li>
+          <li style="padding: 6px 0;">A report, written as you work</li>
+        </ul>
+      </div>
+      <div style="padding: 36px; background: rgba(251,113,133,0.04); border: 1px solid rgba(251,113,133,0.3); border-radius: 12px;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #fb7185; letter-spacing: 0.2em; margin-bottom: 18px;">−  MAX IS NOT</div>
+        <ul style="margin: 0; padding: 0; list-style: none; font-size: 22px; line-height: 1.7; color: var(--ink-2);">
+          <li style="padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">A push-button autopilot</li>
+          <li style="padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">A SaaS that holds your data</li>
+          <li style="padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);">A replacement for skill</li>
+          <li style="padding: 6px 0;">A black box</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">03 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 04 · THE MARK
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Mark">
+    <div class="ornament-grid"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px;">
+      <div class="eyebrow">03 — The Mark</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        A chevron of <span class="gradient-text">elevation</span>.
+      </div>
+    </div>
+
+    <!-- Big centered mark with annotations -->
+    <div style="position: absolute; top: 320px; left: 200px; width: 460px; height: 460px;">
+      <svg width="460" height="460" viewBox="0 0 500 500">
+        <use href="#vmark" />
+      </svg>
+      <!-- annotation lines -->
+      <svg width="460" height="460" viewBox="0 0 500 500" style="position: absolute; inset: 0; overflow: visible;">
+        <!-- arrow up -->
+        <line x1="250" y1="50" x2="250" y2="100" stroke="#5a6479" stroke-width="1" stroke-dasharray="3 3" />
+        <text x="250" y="40" text-anchor="middle" font-size="14" fill="#7d8aa1" font-family="'Geist Mono', monospace">UP</text>
+        <!-- diagonal angle -->
+        <line x1="113" y1="386" x2="50" y2="430" stroke="#5a6479" stroke-width="1" stroke-dasharray="3 3" />
+        <line x1="386" y1="386" x2="450" y2="430" stroke="#5a6479" stroke-width="1" stroke-dasharray="3 3" />
+      </svg>
+    </div>
+
+    <!-- Right column: meaning -->
+    <div style="position: absolute; top: 350px; right: 110px; width: 760px; display: flex; flex-direction: column; gap: 28px;">
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 8px;">▲ DIRECTION</div>
+        <div style="font-size: 22px; line-height: 1.5; color: var(--ink-2);">
+          The chevron points <span style="color: var(--ink);">up</span>. Higher ground, better view, advantage.
+        </div>
+      </div>
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 8px;">▦ COMPOSITION</div>
+        <div style="font-size: 22px; line-height: 1.5; color: var(--ink-2);">
+          Two shapes — outer envelope and inner notch — read at any size. From 16 px favicon to billboard.
+        </div>
+      </div>
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 8px;">◇ GRADIENT</div>
+        <div style="font-size: 22px; line-height: 1.5; color: var(--ink-2);">
+          Teal → blue. Calm, technical, signal. Not threat orange. Not military green. <span style="color: var(--ink);">Operational.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">04 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 05 · COLOR
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Color">
+    <div class="ornament-grid"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px;">
+      <div class="eyebrow">04 — Color</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        <span class="gradient-text">Deep night.</span> Cool signal.
+      </div>
+    </div>
+
+    <!-- Color row: 6 swatches across -->
+    <div style="position: absolute; top: 380px; left: 110px; right: 110px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr; gap: 18px; height: 380px;">
+
+      <!-- Gradient hero -->
+      <div style="background: linear-gradient(135deg, #00D4CC 0%, #0066FF 100%); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; color: #06080e;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.2em; opacity: 0.7;">PRIMARY · BRAND GRADIENT</div>
+        <div>
+          <div style="font-size: 28px; font-weight: 700; font-family: 'Geist', sans-serif;">Signal</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; margin-top: 4px; opacity: 0.85;">#00D4CC → #0066FF</div>
+        </div>
+      </div>
+
+      <!-- Teal -->
+      <div style="background: #00D4CC; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; color: #06080e;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.2em; opacity: 0.7;">TEAL</div>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; font-family: 'Geist', sans-serif;">Focus</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; margin-top: 4px; opacity: 0.85;">#00D4CC</div>
+        </div>
+      </div>
+
+      <!-- Blue -->
+      <div style="background: #0066FF; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; color: #e5edf7;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.2em; opacity: 0.7;">BLUE</div>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; font-family: 'Geist', sans-serif;">Depth</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; margin-top: 4px; opacity: 0.85;">#0066FF</div>
+        </div>
+      </div>
+
+      <!-- Night -->
+      <div style="background: #0a0e14; border: 1px solid #1c2330; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; color: #e5edf7;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--faint);">NIGHT · SURFACE</div>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; font-family: 'Geist', sans-serif;">Ground</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; margin-top: 4px; color: var(--muted);">#0a0e14</div>
+        </div>
+      </div>
+
+      <!-- Ink -->
+      <div style="background: #e5edf7; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; color: #06080e;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.2em; opacity: 0.6;">INK</div>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; font-family: 'Geist', sans-serif;">Clarity</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; margin-top: 4px; opacity: 0.6;">#e5edf7</div>
+        </div>
+      </div>
+
+      <!-- Coral -->
+      <div style="background: #fb7185; border-radius: 12px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; color: #06080e;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.2em; opacity: 0.7;">CORAL · ALERT</div>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; font-family: 'Geist', sans-serif;">Threat</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 10px; margin-top: 4px; opacity: 0.85;">#fb7185</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Usage note -->
+    <div style="position: absolute; bottom: 90px; left: 110px; right: 110px; display: flex; gap: 60px; font-size: 16px; color: var(--muted); line-height: 1.5;">
+      <div style="max-width: 600px;">
+        <span style="color: var(--ink);">The gradient is reserved for brand surfaces</span> — the mark, headlines, calls to action, focus rings. Everything else lives on Night with Ink for text.
+      </div>
+      <div style="max-width: 600px;">
+        <span style="color: var(--ink);">Coral is rare on purpose.</span> When operators see it, something needs eyes. Never decorative.
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">05 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 06 · TYPE
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Type">
+    <div class="ornament-grid"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px;">
+      <div class="eyebrow">05 — Type</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        Three voices.<br /><span class="gradient-text">One conversation.</span>
+      </div>
+    </div>
+
+    <!-- Type specimen grid -->
+    <div style="position: absolute; top: 360px; left: 110px; right: 110px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px;">
+
+      <!-- Geist Display -->
+      <div style="padding: 32px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; min-height: 380px;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 14px;">DISPLAY · GEIST</div>
+        <div style="font-family: 'Geist', sans-serif; font-size: 110px; font-weight: 700; line-height: 0.9; letter-spacing: -0.04em; color: var(--ink);">Aa</div>
+        <div style="font-family: 'Geist', sans-serif; font-size: 42px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; color: var(--ink-2); margin-top: 20px;">Tight headlines.</div>
+        <div style="margin-top: 22px; font-size: 13px; color: var(--muted); line-height: 1.5;">
+          Used for slide titles, hero copy, big numbers. Tight tracking. Weight 600–700.
+        </div>
+      </div>
+
+      <!-- Inter Body -->
+      <div style="padding: 32px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; min-height: 380px;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 14px;">BODY · INTER</div>
+        <div style="font-family: 'Inter', sans-serif; font-size: 110px; font-weight: 500; line-height: 0.9; letter-spacing: -0.02em; color: var(--ink);">Aa</div>
+        <div style="font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.55; color: var(--ink-2); margin-top: 20px;">
+          The workspace runs on Inter. It's quiet, neutral, and reads cleanly at small sizes across a dense, multi-pane UI.
+        </div>
+        <div style="margin-top: 18px; font-size: 13px; color: var(--muted); line-height: 1.5;">
+          Used for everything that isn't a title or code.
+        </div>
+      </div>
+
+      <!-- Geist Mono -->
+      <div style="padding: 32px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; min-height: 380px;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em; margin-bottom: 14px;">CODE · GEIST MONO</div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 110px; font-weight: 500; line-height: 0.9; color: var(--ink);">Aa</div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 16px; line-height: 1.5; color: var(--teal); margin-top: 20px;">
+          $ nmap -sV api.northwind.io<br />
+          <span style="color: var(--muted);">443/tcp · nginx 1.20.0</span>
+        </div>
+        <div style="margin-top: 18px; font-size: 13px; color: var(--muted); line-height: 1.5;">
+          Commands, IDs, hex values, timestamps, hosts. Anywhere precision matters.
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">06 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 07 · VOICE
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Voice">
+    <div class="ornament-grid"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px;">
+      <div class="eyebrow">06 — Voice</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        Talk like the <span class="gradient-text">operator next to you</span>.
+      </div>
+    </div>
+
+    <!-- 4-quadrant voice grid -->
+    <div style="position: absolute; top: 380px; left: 110px; right: 110px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px;">
+      <!-- Q1 -->
+      <div style="padding: 30px; background: var(--bg-2); border-left: 3px solid var(--teal); border-radius: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em;">DO</span>
+          <span style="font-family: 'Geist', sans-serif; font-size: 24px; font-weight: 600; color: var(--ink);">Be specific.</span>
+        </div>
+        <div style="font-size: 17px; color: var(--ink-2); line-height: 1.55;">
+          "Recovered key 'northwind2023' validates on auth.northwind.io." Not "potential auth issue."
+        </div>
+      </div>
+      <!-- Q2 -->
+      <div style="padding: 30px; background: var(--bg-2); border-left: 3px solid var(--teal); border-radius: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em;">DO</span>
+          <span style="font-family: 'Geist', sans-serif; font-size: 24px; font-weight: 600; color: var(--ink);">Show your work.</span>
+        </div>
+        <div style="font-size: 17px; color: var(--ink-2); line-height: 1.55;">
+          Every finding links to evidence. Every action links to the turn that produced it. No magic.
+        </div>
+      </div>
+      <!-- Q3 -->
+      <div style="padding: 30px; background: var(--bg-2); border-left: 3px solid #fb7185; border-radius: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #fb7185; letter-spacing: 0.2em;">DON'T</span>
+          <span style="font-family: 'Geist', sans-serif; font-size: 24px; font-weight: 600; color: var(--ink);">Manufacture drama.</span>
+        </div>
+        <div style="font-size: 17px; color: var(--ink-2); line-height: 1.55;">
+          No "🚨 Critical alert!" copy. No exclamation points in error states. Severity comes from the score, not the tone.
+        </div>
+      </div>
+      <!-- Q4 -->
+      <div style="padding: 30px; background: var(--bg-2); border-left: 3px solid #fb7185; border-radius: 6px;">
+        <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 11px; color: #fb7185; letter-spacing: 0.2em;">DON'T</span>
+          <span style="font-family: 'Geist', sans-serif; font-size: 24px; font-weight: 600; color: var(--ink);">Sell.</span>
+        </div>
+        <div style="font-size: 17px; color: var(--ink-2); line-height: 1.55;">
+          Operators recognize marketing copy in three seconds and tune it out. Write like a colleague handing you a finding.
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">07 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 08 · LOGO SYSTEM
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Logo system">
+    <div class="ornament-grid"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px;">
+      <div class="eyebrow">07 — Logo System</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        Four lockups. <span class="gradient-text">One identity.</span>
+      </div>
+    </div>
+
+    <!-- 4-up logo grid -->
+    <div style="position: absolute; top: 360px; left: 110px; right: 110px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 18px;">
+      <!-- Mark only · dark -->
+      <div style="background: #0a0e14; border: 1px solid var(--border); border-radius: 12px; padding: 50px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">
+        <svg width="180" height="180" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      </div>
+      <!-- Mark only · light -->
+      <div style="background: #f3f4f8; border: 1px solid var(--border); border-radius: 12px; padding: 50px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;">
+        <svg width="180" height="180" viewBox="0 0 500 500">
+          <path d="M113.10,386.90 L250.00,113.10 L386.90,386.90 L250.00,250.00 Z" fill="#0a1530" />
+          <line x1="113.10" y1="386.90" x2="250.00" y2="113.10" stroke="rgba(255,255,255,0.4)" stroke-width="3" />
+          <line x1="250.00" y1="179.70" x2="250.00" y2="264.80" stroke="rgba(255,255,255,0.2)" stroke-width="2" />
+        </svg>
+      </div>
+      <!-- Horizontal lockup -->
+      <div style="background: #0a0e14; border: 1px solid var(--border); border-radius: 12px; padding: 40px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; gap: 18px;">
+        <svg width="90" height="90" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+        <div class="word" style="font-size: 32px;">MAX</div>
+      </div>
+      <!-- Stacked w/ tagline -->
+      <div style="background: #0a0e14; border: 1px solid var(--border); border-radius: 12px; padding: 36px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;">
+        <svg width="80" height="80" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+        <div class="word" style="font-size: 28px;">MAX</div>
+        <div class="lede" style="font-size: 14px; color: var(--teal);">Where threats come into focus.</div>
+      </div>
+    </div>
+
+    <!-- Labels under each -->
+    <div style="position: absolute; top: 730px; left: 110px; right: 110px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 18px; font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.2em;">
+      <div>MARK · DARK</div>
+      <div>MARK · LIGHT</div>
+      <div>HORIZONTAL</div>
+      <div>STACKED · TAGLINE</div>
+    </div>
+
+    <!-- Sizing guidance -->
+    <div style="position: absolute; bottom: 100px; left: 110px; right: 110px; padding: 20px 26px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; gap: 30px; font-size: 14px; color: var(--ink-2);">
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em;">CLEAR SPACE</div>
+      <span>Minimum padding around the mark equals 1× the inner notch height. <span style="color: var(--muted);">Never crop, recolor, rotate, or stretch.</span></span>
+      <div style="flex: 1;"></div>
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--teal); letter-spacing: 0.2em;">MIN SIZE</div>
+      <span>Mark: 16 px digital · 8 mm print. Wordmark: 80 px digital · 24 mm print.</span>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">08 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 09 · IN USE
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="In Use">
+    <div class="ornament-grid"></div>
+
+    <div style="position: absolute; top: 110px; left: 110px;">
+      <div class="eyebrow">08 — In Use</div>
+      <div style="font-family: 'Geist', sans-serif; font-size: 72px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; margin-top: 18px;">
+        The brand <span class="gradient-text">at work</span>.
+      </div>
+    </div>
+
+    <!-- 3 mockups in a row -->
+    <div style="position: absolute; top: 360px; left: 110px; right: 110px; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 22px;">
+
+      <!-- Product UI mockup -->
+      <div style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; aspect-ratio: 16/10;">
+        <!-- Window chrome -->
+        <div style="height: 36px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 14px; gap: 10px;">
+          <svg width="16" height="16" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+          <span class="word" style="font-size: 11px; color: var(--ink);">MAX</span>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--faint); margin-left: 8px;">NW-WEB-2026-03</span>
+        </div>
+        <!-- Body -->
+        <div style="padding: 16px; display: grid; grid-template-columns: 60px 1fr 100px; gap: 10px; height: calc(100% - 36px);">
+          <!-- Sidebar -->
+          <div style="background: var(--bg); border-radius: 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 10px;">
+            <div style="width: 28px; height: 6px; background: var(--teal); border-radius: 2px;"></div>
+            <div style="width: 28px; height: 6px; background: var(--border); border-radius: 2px;"></div>
+            <div style="width: 28px; height: 6px; background: var(--border); border-radius: 2px;"></div>
+          </div>
+          <!-- Stream -->
+          <div style="background: var(--bg); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--teal);">▸ TOOL</div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--ink-2); padding: 4px; background: var(--bg-3); border-radius: 3px;">$ nmap -sV api.nw.io</div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: #4ade80; margin-top: 4px;">▸ RESULT</div>
+            <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--ink-2); padding: 4px; background: rgba(74,210,149,0.08); border-radius: 3px;">443/tcp open · nginx 1.20.0</div>
+          </div>
+          <!-- Findings -->
+          <div style="background: var(--bg); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 4px;">
+            <div style="background: rgba(224,83,61,0.2); color: #e0533d; font-size: 8px; padding: 2px 4px; border-radius: 2px; text-align: center; font-weight: 700;">HIGH</div>
+            <div style="background: rgba(224,169,61,0.2); color: #e0a93d; font-size: 8px; padding: 2px 4px; border-radius: 2px; text-align: center; font-weight: 700;">MED</div>
+            <div style="background: rgba(122,182,224,0.2); color: #7ab6e0; font-size: 8px; padding: 2px 4px; border-radius: 2px; text-align: center; font-weight: 700;">LOW</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report cover -->
+      <div style="background: #06080e; border: 1px solid var(--border); border-radius: 12px; padding: 30px; aspect-ratio: 16/10; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,212,204,0.15), transparent 70%);"></div>
+        <div>
+          <svg width="48" height="48" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--teal); letter-spacing: 0.2em; margin-top: 14px;">PENETRATION TEST REPORT</div>
+          <div class="word" style="font-size: 13px; margin-top: 4px;">MAX</div>
+        </div>
+        <div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em;">External Web<br />Assessment</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 8px;">NORTHWIND COMMERCE</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--faint); margin-top: 2px;">NW-WEB-2026-03 · MAY 2026</div>
+        </div>
+      </div>
+
+      <!-- Business card -->
+      <div style="background: #0a0e14; border: 1px solid var(--border); border-radius: 12px; padding: 30px; aspect-ratio: 16/10; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+        <div style="position: absolute; bottom: -30px; left: -30px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(0,102,255,0.18), transparent 70%);"></div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg width="32" height="32" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+          <div class="word" style="font-size: 14px;">MAX</div>
+        </div>
+        <div>
+          <div style="font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink);">J. Calder</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Senior Operator</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 9px; color: var(--teal); margin-top: 12px;">operator@max.sec</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Labels -->
+    <div style="position: absolute; top: 870px; left: 110px; right: 110px; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 22px; font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.2em;">
+      <div>PRODUCT · WORKSPACE</div>
+      <div>DELIVERABLE · REPORT COVER</div>
+      <div>STATIONERY · CARD</div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">09 / 10</div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Slide 10 · TAGLINE / CLOSING
+       ════════════════════════════════════════════════════════════ -->
+  <section data-label="Tagline">
+    <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, #0e1828 0%, #0a0e14 50%, #06080e 100%);"></div>
+    <div class="ornament-grid"></div>
+    <div class="ornament-glow" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center;">
+      <svg class="vmark" width="150" height="150"><use href="#vmark" /></svg>
+      <div style="font-family: 'Geist', sans-serif; font-size: 96px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; max-width: 1400px;">
+        Where threats<br /><span class="gradient-text">come into focus.</span>
+      </div>
+      <div style="width: 280px; height: 1px; background: linear-gradient(90deg, transparent, var(--teal), transparent); margin-top: 16px;"></div>
+      <div style="font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--muted); letter-spacing: 0.3em; max-width: 800px;">
+        ENGAGEMENT-SCOPED · OPERATOR-CONTROLLED · METHODOLOGY-DRIVEN
+      </div>
+      <div style="font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--faint); letter-spacing: 0.2em; max-width: 900px; line-height: 1.7;">
+        VULNERABILITY AND ADVERSARIAL NETWORK TESTING, ANALYSIS, GUIDANCE ENGINE
+      </div>
+    </div>
+
+    <div class="slide-brand">
+      <svg width="14" height="14" viewBox="0 0 500 500"><use href="#vmark" /></svg>
+      MAX
+    </div>
+    <div class="slide-num">10 / 10</div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+</body>
+</html>

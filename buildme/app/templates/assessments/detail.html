@@ -11,7 +11,13 @@
 </table>
 
 <h3>Phases</h3>
+{% set has_runnable = phases | selectattr('status', 'in', ['pending', 'failed']) | list | length %}
 {% if phases %}
+<div style="margin-bottom:0.5rem">
+  {% if has_runnable %}
+  <button id="btn-run-all" class="btn">Run All</button>
+  {% endif %}
+</div>
 <table>
   <thead>
     <tr>
@@ -50,21 +56,106 @@
 <p>No phases configured.</p>
 {% endif %}
 
-<h3>Live Output</h3>
-<div id="output-tabs">
-  {% for p in phases %}
-  <button class="output-tab" data-phase-id="{{ p.id }}"
-          {% if p.status == 'pending' %}disabled{% endif %}>
-    {{ p.phase_definition.label }}
-  </button>
-  {% endfor %}
+<div id="detail-tabs">
+  <button class="detail-tab active" data-tab="output">Live Output</button>
+  <button class="detail-tab" data-tab="findings">Findings</button>
 </div>
-<div id="output-console">
-  <pre id="output-content">Select a phase to view output.</pre>
+
+<div id="detail-output" class="detail-panel">
+  <div id="output-tabs">
+    {% for p in phases %}
+    <button class="output-tab" data-phase-id="{{ p.id }}"
+            {% if p.status == 'pending' %}disabled{% endif %}>
+      {{ p.phase_definition.label }}
+    </button>
+    {% endfor %}
+  </div>
+  <div id="output-console">
+    <pre id="output-content">Select a phase to view output.</pre>
+  </div>
+  <div id="output-actions">
+    <button id="btn-analyze" class="btn-ai" disabled title="Analyze this phase output with AI">
+      <span class="ai-dot"></span> Analyze with AI
+    </button>
+  </div>
+  <div id="analysis-panel" style="display:none">
+    <div id="analysis-header">
+      <span class="ai-dot"></span> AI Analysis
+      <button id="btn-close-analysis" class="btn-small" style="margin-left:auto">&times;</button>
+    </div>
+    <pre id="analysis-content"></pre>
+  </div>
+</div>
+
+<div id="detail-findings" class="detail-panel" style="display:none">
+  {% set all_findings = [] %}
+  {% for p in phases %}
+    {% for f in p.findings %}
+      {% set _ = all_findings.append(f) %}
+    {% endfor %}
+  {% endfor %}
+  {% if all_findings %}
+  <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Title</th>
+        <th>Status</th>
+        <th>CVSS</th>
+        <th>CWE</th>
+        <th>Evidence</th>
+        <th>Phase</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in phases %}
+        {% for f in p.findings %}
+        <tr data-finding-id="{{ f.id }}">
+          <td><span class="severity-{{ f.severity }}">{{ f.severity }}</span></td>
+          <td>{{ f.title }}</td>
+          <td>
+            <select class="inline-edit" data-finding-id="{{ f.id }}" data-field="status"
+                    onchange="updateFinding(this)">
+              <option value="open" {% if f.status == 'open' %}selected{% endif %}>Open</option>
+              <option value="confirmed" {% if f.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+              <option value="false_positive" {% if f.status == 'false_positive' %}selected{% endif %}>False Positive</option>
+              <option value="accepted" {% if f.status == 'accepted' %}selected{% endif %}>Accepted</option>
+              <option value="remediated" {% if f.status == 'remediated' %}selected{% endif %}>Remediated</option>
+            </select>
+          </td>
+          <td><input class="inline-edit" type="number" step="0.1" min="0" max="10"
+                     data-finding-id="{{ f.id }}" data-field="cvss_score"
+                     value="{{ f.cvss_score if f.cvss_score else '' }}"
+                     onchange="updateFinding(this)" style="width:60px"></td>
+          <td>{{ f.cwe_id if f.cwe_id else '--' }}</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+              title="{{ f.evidence if f.evidence else '' }}">
+            {{ f.evidence[:80] + '...' if f.evidence and f.evidence|length > 80 else f.evidence or '--' }}
+          </td>
+          <td>{{ p.phase_definition.label }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('findings.delete', id=f.id) }}" style="display:inline">
+              <button type="submit" class="btn-small btn-danger"
+                      onclick="return confirm('Delete this finding?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No findings yet. Findings are automatically extracted from tool output when a phase completes.</p>
+  {% endif %}
+  <div style="margin-top:1rem">
+    <a href="{{ url_for('findings.new') }}?assessment_id={{ assessment.id }}" class="btn">Add Finding Manually</a>
+  </div>
 </div>
 
 <p>
   <a href="{{ url_for('assessments.list_view') }}" class="btn">Back to Assessments</a>
+  <a href="{{ url_for('reports.preview', assessment_id=assessment.id) }}" class="btn">Report</a>
   <form method="POST" action="{{ url_for('assessments.delete', id=assessment.id) }}" style="display:inline">
     <button type="submit" class="btn-small btn-danger"
             onclick="return confirm('Delete this assessment?')">Delete</button>
@@ -74,6 +165,22 @@
 
 {% block scripts %}
 <script>
+function updateFinding(el) {
+  var findingId = el.dataset.findingId;
+  var field = el.dataset.field;
+  var value = el.value;
+  var formData = new FormData();
+  formData.append('field', field);
+  formData.append('value', value);
+  fetch('/findings/' + findingId + '/edit', {
+    method: 'POST',
+    body: formData,
+    headers: {'X-Requested-With': 'XMLHttpRequest'}
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.error) console.error(data.error);
+  }).catch(function(err) { console.error(err); });
+}
+
 (function() {
   var activePhaseId = null;
   var eventSource = null;
@@ -141,6 +248,48 @@
     };
   }
 
+  document.querySelectorAll('.detail-tab').forEach(function(t) {
+    t.addEventListener('click', function() {
+      document.querySelectorAll('.detail-tab').forEach(function(x) { x.classList.remove('active'); });
+      this.classList.add('active');
+      document.querySelectorAll('.detail-panel').forEach(function(x) { x.style.display = 'none'; });
+      document.getElementById('detail-' + this.dataset.tab).style.display = '';
+    });
+  });
+
+  document.getElementById('btn-run-all')?.addEventListener('click', function() {
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Starting...';
+    fetch('/assessments/' + currentAssessmentId + '/run-all', {
+      method: 'POST',
+      headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) {
+        appendOutput('Error: ' + data.error);
+        btn.disabled = false;
+        btn.textContent = 'Run All';
+      } else {
+        appendOutput('--- Starting ' + data.phases.length + ' phase(s) ---');
+        data.phases.forEach(function(p) {
+          setPhaseStatus(p.phase_id, 'running');
+          var tab = document.querySelector('.output-tab[data-phase-id="' + p.phase_id + '"]');
+          if (tab) tab.disabled = false;
+        });
+        btn.textContent = 'Running...';
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      }
+    })
+    .catch(function(err) {
+      appendOutput('Error: ' + err);
+      btn.disabled = false;
+      btn.textContent = 'Run All';
+    });
+  });
+
   document.addEventListener('click', function(e) {
     var runBtn = e.target.closest('.btn-run');
     if (runBtn) {
@@ -197,12 +346,51 @@
       document.querySelectorAll('.output-tab').forEach(function(t) { t.classList.remove('active'); });
       tabBtn.classList.add('active');
       var phaseId = tabBtn.dataset.phaseId;
+      analyzeBtn.dataset.phaseId = phaseId;
+      analyzeBtn.disabled = false;
       connectStream(phaseId);
     }
   });
 
   var firstActive = document.querySelector('.output-tab:not([disabled])');
   if (firstActive) firstActive.click();
+
+  var analyzeBtn = document.getElementById('btn-analyze');
+  var analysisPanel = document.getElementById('analysis-panel');
+  var analysisContent = document.getElementById('analysis-content');
+
+  analyzeBtn.addEventListener('click', function() {
+    var phaseId = this.dataset.phaseId;
+    if (!phaseId) return;
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Analyzing...';
+    analysisPanel.style.display = '';
+    analysisContent.textContent = 'Running analysis...';
+    fetch('/assessments/' + currentAssessmentId + '/phases/' + phaseId + '/analyze', {
+      method: 'POST',
+      headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) {
+        analysisContent.textContent = 'Error: ' + data.error;
+      } else {
+        analysisContent.textContent = data.analysis;
+      }
+      btn.textContent = 'Analyze with AI';
+      btn.disabled = false;
+    })
+    .catch(function(err) {
+      analysisContent.textContent = 'Error: ' + err;
+      btn.textContent = 'Analyze with AI';
+      btn.disabled = false;
+    });
+  });
+
+  document.getElementById('btn-close-analysis').addEventListener('click', function() {
+    analysisPanel.style.display = 'none';
+  });
 })();
 </script>
 {% endblock %}

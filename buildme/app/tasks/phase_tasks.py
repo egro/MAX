@@ -1,11 +1,15 @@
+import json
+
 from datetime import datetime, timezone
 
+import redis as redis_lib
 from flask import current_app
 
 from app.extensions import celery, db
 from app.models.assessment import Assessment
 from app.models.assessment_phase import AssessmentPhase
 from app.services.tool_runner import run_command
+from app.services.finding_extractor import extract_findings_from_output
 
 
 @celery.task(bind=True)
@@ -43,5 +47,20 @@ def run_phase_task(self, assessment_id, phase_id):
         assessment.status = "completed"
 
     db.session.commit()
+
+    try:
+        r = redis_lib.Redis.from_url(redis_url)
+        history_key = f"phase:{assessment_id}:{phase_id}:history"
+        lines = r.lrange(history_key, 0, -1)
+        r.close()
+        output_lines = [
+            json.loads(msg.decode())["line"]
+            for msg in lines
+            if json.loads(msg.decode()).get("type") == "output"
+        ]
+        if output_lines:
+            extract_findings_from_output(assessment_id, phase_id, output_lines)
+    except Exception:
+        pass
 
     return {"status": ap.status}

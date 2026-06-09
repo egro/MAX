@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timezone
 
 from app.extensions import db
@@ -11,6 +12,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), default='user')
+    api_key = db.Column(db.String(64), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def set_password(self, password):
@@ -18,3 +20,7 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def generate_api_key(self):
+        self.api_key = secrets.token_urlsafe(32)
+        return self.api_key

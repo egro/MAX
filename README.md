@@ -105,10 +105,14 @@ buildme/
 │   │   ├── auth.py            # Login, logout, register
 │   │   ├── engines.py         # Engine API + health dashboard
 │   │   ├── assessments.py     # Assessment CRUD with phase picker
-│   │   └── phase_definitions.py # Phase definition CRUD (admin)
+│   │   ├── phase_definitions.py # Phase definition CRUD (admin)
+│   │   └── findings.py        # Findings CRUD + inline edit
 │   ├── services/
 │   │   ├── engine_registry.py # Online engine selection
-│   │   └── seed_data.py       # Default phase definition seeding
+│   │   ├── finding_extractor.py # Auto-extraction + LLM-enhanced extraction
+│   │   ├── llm_service.py    # OpenAI-compatible LLM client
+│   │   ├── report_builder.py # Report compilation with optional AI summary
+│   │   └── seed_data.py      # Default phase definition seeding
 │   ├── tasks/
 │   │   └── heartbeat.py       # Celery heartbeat task
 │   ├── templates/
@@ -138,9 +142,10 @@ buildme/
 | D | Assessment + PhaseDefinition CRUD | Done |
 | E | Celery Task Framework + Live Output | Done |
 | F | Tool Installation & Engine Readiness | Done |
-| G | Findings Management | Not started |
-| H | Report Generation | Not started |
-| I | API Layer | Not started |
+| G | Findings Management | Done |
+| H | Report Generation | Done |
+| I | API Layer | Done |
+| J | LLM Integration | Done |
 
 ## Engine Lifecycle
 
@@ -164,6 +169,9 @@ buildme/
 | `REDIS_PASSWORD` | `This-is-a-poor-Redis-password!` | Redis password |
 | `ENGINE_NAME` | `engine-default` | Unique name for the engine |
 | `ENGINE_NETWORK_TAG` | `engine-network-default` | Network segment tag |
+| `LLM_ENDPOINT` | _(optional)_ | OpenAI-compatible API endpoint for AI-enhanced findings, analysis, and reports |
+| `LLM_API_KEY` | _(optional)_ | API key for the LLM endpoint |
+| `LLM_MODEL` | _(optional)_ | Model name to use (e.g. `llama3.2`, `gpt-4o`) |
 
 ### engine — required env vars (no defaults, must be exported)
 

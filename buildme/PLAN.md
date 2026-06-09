@@ -84,9 +84,10 @@ Shipped with the app and stored in the DB. Users with `admin` role can create/ed
 | **D:** Assessment + PhaseDefinition CRUD | `[DONE]` |
 | **E:** Celery Task Framework + Live Output | `[DONE]` |
 | **F:** Tool Installation & Engine Readiness | `[DONE]` |
-| **G:** Findings Management | `[NOT STARTED]` |
-| **H:** Report Generation | `[NOT STARTED]` |
-| **I:** API Layer | `[NOT STARTED]` |
+| **G:** Findings Management | `[DONE]` |
+| **H:** Report Generation | `[DONE]` |
+| **I:** API Layer | `[DONE]` |
+| **J:** LLM Integration | `[DONE]` |
 
 **Status Key:** `[NOT STARTED]` — `[IN PROGRESS]` — `[DONE]` — `[BLOCKED]`
 
@@ -105,30 +106,41 @@ buildme/
 │   ├── docker-compose.yml        # Engine-only, standalone
 │   ├── entrypoint.sh             # Engine auto-registration on startup
 │   ├── start.sh                  # Validates required vars, injects host IPs
+│   ├── .env
 │   └── .env.example
 ├── app/
-│   ├── __init__.py               # Flask app factory, CLI init
+│   ├── __init__.py               # Flask app factory, CLI init, blueprint registration
 │   ├── cli.py                    # Flask CLI commands (set-role, list-users)
 │   ├── config.py                 # Configuration (DB, Redis, secrets)
 │   ├── extensions.py             # db, migrate, login_manager, celery init
+│   ├── decorators.py             # admin_required decorator
 │   ├── models/
-│   │   ├── user.py               # User (registration, auth, roles)
+│   │   ├── __init__.py           # All model exports
+│   │   ├── user.py               # User (registration, auth, roles, api_key)
 │   │   ├── engine.py             # Engine registration + heartbeat
 │   │   ├── phase_definition.py   # Phase catalog (user-customizable command templates)
 │   │   ├── assessment.py         # Assessment model (target, phases, status)
 │   │   ├── assessment_phase.py   # Phase instance within an assessment
 │   │   └── finding.py            # Finding model (severity, evidence, frameworks)
 │   ├── routes/
+│   │   ├── __init__.py           # (empty)
 │   │   ├── auth.py               # Login, logout, register
 │   │   ├── engines.py            # Engine API + health dashboard
-│   │   ├── assessments.py        # Assessment CRUD
+│   │   ├── assessments.py        # Assessment CRUD, phase run/stop/stream SSE
 │   │   ├── phase_definitions.py  # Phase definition CRUD (admin)
-│   │   └── findings.py           # Findings list/edit
+│   │   ├── findings.py           # Findings CRUD + inline edit
+│   │   ├── reports.py            # Report preview + download
+│   │   └── api.py                # REST API v1 (token-based, all resources)
 │   ├── services/
-│   │   ├── tool_runner.py        # Subprocess wrapper, Redis pub/sub
-│   │   ├── engine_registry.py    # Engine selection logic
-│   │   ├── report_builder.py
-│   │   └── framework_mapper.py
+│   │   ├── tool_runner.py        # Subprocess wrapper, Redis pub/sub streaming
+│   │   ├── engine_registry.py    # Engine selection/registration logic
+│   │   ├── finding_extractor.py  # Auto-extraction + LLM-enhanced extraction
+│   │   ├── llm_service.py        # OpenAI-compatible LLM client
+│   │   ├── report_builder.py     # Jinja2 -> Markdown report compilation
+│   │   └── seed_data.py          # Seed default phase definitions
+│   ├── tasks/
+│   │   ├── phase_tasks.py        # Celery task: run phase, auto-extract findings
+│   │   └── heartbeat.py          # Celery beat: engine heartbeat every 30s
 │   ├── templates/
 │   │   ├── base.html
 │   │   ├── auth/
@@ -139,12 +151,13 @@ buildme/
 │   │   ├── assessments/
 │   │   │   ├── list.html
 │   │   │   ├── new.html
-│   │   │   └── detail.html
+│   │   │   └── detail.html       # Phase tabs, live output, findings tab
 │   │   ├── phase_definitions/
 │   │   │   ├── list.html
 │   │   │   └── edit.html
 │   │   ├── findings/
-│   │   │   └── list.html
+│   │   │   ├── list.html
+│   │   │   └── new.html
 │   │   └── reports/
 │   │       └── view.html
 │   └── static/
@@ -160,39 +173,40 @@ buildme/
 
 ## Phase A: Docker & Foundation `[DONE]`
 
-- [ ] `webhost/Dockerfile.web` — python:3.12-slim, Flask + gunicorn, no attack tools
-- [ ] `engine/Dockerfile.engine` — Kali Linux + Python + Celery + all attack tools
-- [ ] `webhost/docker-compose.yml` — web, db (postgres:16), redis (redis:7 + requirepass)
-- [ ] `engine/docker-compose.yml` — engine, standalone
-- [ ] `webhost/.env.example` — POSTGRES_*, REDIS_PASSWORD, SECRET_KEY, FLASK_ENV
-- [ ] `requirements.txt` — flask, flask-login, flask-sqlalchemy, flask-migrate, celery[redis], psycopg2-binary, gunicorn, bleach, markdown
-- [ ] `app/__init__.py` — Flask app factory
-- [ ] `app/config.py` — configuration (DB URI, Redis with password, Celery broker)
-- [ ] `app/extensions.py` — db, migrate, login_manager, celery init
-- [ ] `app/templates/base.html` — bare-bones HTML skeleton with minimal CSS
-- [ ] `app/static/css/app.css` — minimal custom stylesheet
+- [x] `webhost/Dockerfile.web` — python:3.12-slim, Flask + gunicorn, no attack tools
+- [x] `engine/Dockerfile.engine` — Kali Linux + Python + Celery + all attack tools
+- [x] `webhost/docker-compose.yml` — web, db (postgres:16), redis (redis:7 + requirepass)
+- [x] `engine/docker-compose.yml` — engine, standalone
+- [x] `webhost/.env.example` — POSTGRES_*, REDIS_PASSWORD, SECRET_KEY, FLASK_ENV
+- [x] `engine/.env.example`
+- [x] `requirements.txt` — flask, flask-login, flask-sqlalchemy, flask-migrate, celery[redis], psycopg2-binary, gunicorn, bleach, markdown, redis>=5.0, gevent>=24
+- [x] `app/__init__.py` — Flask app factory
+- [x] `app/config.py` — configuration (DB URI, Redis with password, Celery broker)
+- [x] `app/extensions.py` — db, migrate, login_manager, celery init
+- [x] `app/templates/base.html` — bare-bones HTML skeleton with minimal CSS
+- [x] `app/static/css/app.css` — minimal custom stylesheet
 
 ---
 
 ## Phase B: Auth & User Model `[DONE]`
 
-- [ ] `app/models/user.py` — User model (id, username, password_hash, role, created_at)
-- [ ] `app/routes/auth.py` — login, logout, register endpoints
-- [ ] Flask-Login integration in extensions.py
-- [ ] `app/templates/auth/login.html`
-- [ ] `app/templates/auth/register.html`
+- [x] `app/models/user.py` — User model (id, username, password_hash, role, created_at, api_key)
+- [x] `app/routes/auth.py` — login, logout, register endpoints
+- [x] Flask-Login integration in extensions.py
+- [x] `app/templates/auth/login.html`
+- [x] `app/templates/auth/register.html`
 
 ---
 
 ## Phase C: Engine Registration + Health `[DONE]`
 
-- [ ] `app/models/engine.py` — Engine model (id, name, network_tag, ip, status, last_heartbeat_at, registered_at)
-- [ ] `app/services/engine_registry.py` — engine selection logic
-- [ ] `app/routes/engines.py` — POST /api/engines/register (called by engine at startup), GET /engines (health dashboard)
-- [ ] `app/templates/engines/list.html` — engine health dashboard (green/red per engine)
-- [ ] Engine entrypoint script — startup curl to register, then launch Celery worker
-- [ ] `app/tasks/heartbeat.py` — Celery periodic task (every 30s, updates last_heartbeat_at)
-- [ ] Redis auth configured — all connection strings use REDIS_PASSWORD
+- [x] `app/models/engine.py` — Engine model (id, name, network_tag, ip, status, last_heartbeat_at, registered_at)
+- [x] `app/services/engine_registry.py` — engine selection logic
+- [x] `app/routes/engines.py` — POST /api/engines/register (called by engine at startup), GET /engines (health dashboard)
+- [x] `app/templates/engines/list.html` — engine health dashboard (green/red per engine)
+- [x] Engine entrypoint script — startup curl to register, then launch Celery worker
+- [x] `app/tasks/heartbeat.py` — Celery periodic task (every 30s, updates last_heartbeat_at)
+- [x] Redis auth configured — all connection strings use REDIS_PASSWORD
 
 ---
 
@@ -241,44 +255,70 @@ buildme/
 
 ---
 
-## Phase G: Findings Management `[NOT STARTED]`
+## Phase G: Findings Management `[COMPLETE]`
 
-- [ ] `app/models/finding.py` — Finding model (title, severity, CVSS, CWE, OWASP, NIST, SANS, evidence, risk, remediation, phase_id FK)
-- [ ] `app/routes/findings.py` — list, update, create endpoints
-- [ ] `app/templates/findings/list.html` — filterable table (by severity, phase, status)
-- [ ] Edit finding inline (severity, status, CVSS, notes)
-- [ ] Add manual finding form
-- [ ] Auto-extraction of findings from tool output
-
----
-
-## Phase H: Report Generation `[NOT STARTED]`
-
-- [ ] `app/services/report_builder.py` — Jinja2 -> .md report compilation
-- [ ] Report layout to be designed collaboratively
-- [ ] `app/templates/reports/view.html` — preview in browser
-- [ ] Download as .md
+- [x] `app/models/finding.py` — Finding model (title, severity, CVSS, CWE, OWASP, NIST, SANS, evidence, risk, remediation, phase_id FK)
+- [x] `app/routes/findings.py` — list, update, create endpoints
+- [x] `app/templates/findings/list.html` — filterable table (by severity, phase, status)
+- [x] Edit finding inline (severity, status, CVSS)
+- [x] Add manual finding form (`app/templates/findings/new.html`)
+- [x] Auto-extraction of findings from tool output (`app/services/finding_extractor.py`)
+- [x] Findings tab integrated into assessment detail page (inline edit selects for status/CVSS)
+- [x] Auto-extraction invoked from `run_phase_task` after phase completes
+- [x] Findings by-assessment page (`/findings/by-assessment`) with severity count badges
+- [x] "Run All" button dispatches all pending/failed phases at once (`POST /assessments/<id>/run-all`)
 
 ---
 
-## Phase I: API Layer `[NOT STARTED]`
+## Phase H: Report Generation `[COMPLETE]`
 
-- [ ] Flask Blueprint for REST API
-- [ ] Token-based auth (API key per user)
-- [ ] Endpoints for engines CRUD
-- [ ] Endpoints for assessments CRUD
-- [ ] Endpoint for phase trigger
-- [ ] Endpoints for findings CRUD
-- [ ] Endpoints for phase definitions CRUD
-- [ ] Endpoint for engine heartbeat + health
-- [ ] Endpoint for report download
+- [x] `app/services/report_builder.py` — Jinja2 -> .md report compilation
+- [x] Report layout designed: executive summary, findings by severity with evidence/risk/remediation, phase summary, framework references
+- [x] `app/templates/reports/view.html` — preview in browser (monospace, pre-wrapped render)
+- [x] Download as .md (`/reports/<id>/download`)
+- [x] Report button added to assessment detail page
+
+---
+
+## Phase I: API Layer `[COMPLETE]`
+
+- [x] Flask Blueprint for REST API (`/api/v1`)
+- [x] Token-based auth via `X-API-Key` header (`require_api_key` decorator)
+- [x] `api_key` column on User model with `generate_api_key()` method
+- [x] Endpoints for engines GET list + GET by ID
+- [x] Endpoints for assessments CRUD (GET list, GET by ID, POST create, DELETE)
+- [x] Endpoint for phase trigger (POST .../run)
+- [x] Endpoint for phase stream (SSE)
+- [x] Endpoints for findings CRUD (GET list with filters, POST create, PATCH update, DELETE)
+- [x] Endpoints for phase definitions CRUD (GET list, POST create, PUT update, DELETE)
+- [x] Endpoint for report download
+- [x] API key management endpoints (GET/POST `/api/v1/auth/api-key`, session-based)
+
+---
+
+## Phase J: LLM Integration `[COMPLETE]`
+
+- [x] LLM config added to `config.py` (`LLM_ENDPOINT`, `LLM_API_KEY`, `LLM_MODEL`)
+- [x] `app/services/llm_service.py` — OpenAI-compatible chat completions client:
+  - `query_llm()` — generic chat with configurable system prompt
+  - `extract_findings_via_llm()` — sends tool output, returns structured findings
+  - `generate_executive_summary()` — writes report executive summary
+- [x] Enhanced auto-extraction in `finding_extractor.py` — regex + LLM pass (deduplicated)
+- [x] AI executive summary in `report_builder.py` — replaces boilerplate with LLM-generated text
+- [x] `POST /assessments/<id>/phases/<phase_id>/analyze` — on-demand phase output analysis
+- [x] "Analyze with AI" button in assessment detail page — sends phase output, shows results
+- [x] LLM status indicator in nav (purple dot when configured)
+- [x] CSS for AI button, analysis panel, nav indicator
+- [x] `.env.example` and `docker-compose.yml` updated with LLM vars
+- [x] Docs updated (README.md, PLAN.md)
+- [x] All LLM calls gracefully skipped when `LLM_ENDPOINT` is unset
 
 ---
 
 ## Implementation Order
 
 ```
-Phase A  ->  Phase B  ->  Phase C  ->  Phase D  ->  Phase E  ->  Phase F  ->  Phase G  ->  Phase H  ->  Phase I
+Phase A  ->  Phase B  ->  Phase C  ->  Phase D  ->  Phase E  ->  Phase F  ->  Phase G  ->  Phase H  ->  Phase I  ->  Phase J
 ```
 
 Each phase is self-contained and testable. We build sequentially, verifying as we go. Status badges are updated in real-time as work progresses.

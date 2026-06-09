@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}New Finding{% endblock %}
+{% block content %}
+<h2>New Finding</h2>
+
+<form method="POST">
+  <div>
+    <label for="title">Title *</label>
+    <input type="text" name="title" id="title" required>
+  </div>
+  <div>
+    <label for="severity">Severity</label>
+    <select name="severity" id="severity">
+      <option value="info">Info</option>
+      <option value="low">Low</option>
+      <option value="medium" selected>Medium</option>
+      <option value="high">High</option>
+      <option value="critical">Critical</option>
+    </select>
+  </div>
+  <div>
+    <label for="cvss_score">CVSS Score</label>
+    <input type="number" name="cvss_score" id="cvss_score" step="0.1" min="0" max="10">
+  </div>
+  <div>
+    <label for="cwe_id">CWE ID</label>
+    <input type="text" name="cwe_id" id="cwe_id" placeholder="e.g. CWE-79">
+  </div>
+  <div>
+    <label for="owasp_category">OWASP Category</label>
+    <input type="text" name="owasp_category" id="owasp_category" placeholder="e.g. A1: Injection">
+  </div>
+  <div>
+    <label for="nist_id">NIST ID</label>
+    <input type="text" name="nist_id" id="nist_id">
+  </div>
+  <div>
+    <label for="sans_id">SANS ID</label>
+    <input type="text" name="sans_id" id="sans_id">
+  </div>
+  <div>
+    <label for="evidence">Evidence</label>
+    <textarea name="evidence" id="evidence" rows="4"></textarea>
+  </div>
+  <div>
+    <label for="risk">Risk</label>
+    <textarea name="risk" id="risk" rows="3"></textarea>
+  </div>
+  <div>
+    <label for="remediation">Remediation</label>
+    <textarea name="remediation" id="remediation" rows="3"></textarea>
+  </div>
+  {% if phase %}
+  <input type="hidden" name="assessment_phase_id" value="{{ phase.id }}">
+  <p>Linked to phase: <strong>{{ phase.phase_definition.label if phase.phase_definition else 'Phase #' + phase.id | string }}</strong></p>
+  {% endif %}
+  <button type="submit" class="btn">Create Finding</button>
+  <a href="{{ url_for('findings.list_view') }}" class="btn">Cancel</a>
+</form>
+{% endblock %}

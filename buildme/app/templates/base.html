@@ -5,29 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAX — Security Assessment Platform</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="/" class="logo">MAX</a>
-            <div class="nav-links">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('assessments.list_view') }}">Assessments</a>
-                    <a href="{{ url_for('engines.list_engines') }}">Engine Health</a>
-                    {% if current_user.role == 'admin' %}
-                    <a href="{{ url_for('phase_defs.list_view') }}">Phase Definitions</a>
-                    {% endif %}
-                    <span class="nav-user">{{ current_user.username }}</span>
-                    {% if current_user.role == 'admin' %}<span class="badge-admin">admin</span>{% endif %}
-                    <a href="{{ url_for('auth.logout') }}">Log out</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}">Log in</a>
-                    <a href="{{ url_for('auth.register') }}">Register</a>
-                {% endif %}
+    <header class="topbar">
+        <div class="topbar-brand">
+            <svg viewBox="0 0 22 22" fill="none">
+                <rect x="1" y="1" width="20" height="20" rx="4" stroke="url(#g)" stroke-width="1.5"/>
+                <path d="M7 11l3 3 5-6" stroke="url(#g)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs><linearGradient id="g" x1="1" y1="21" x2="21" y2="1"><stop stop-color="#00D4CC"/><stop offset="1" stop-color="#0066FF"/></linearGradient></defs>
+            </svg>
+            <div class="topbar-brand-text">
+                <span class="topbar-brand-name">MAX</span>
+                <span class="topbar-brand-version">v0.1.0</span>
             </div>
+        </div>
+        <nav class="topbar-nav">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('assessments.list_view') }}" class="{% if request.endpoint and 'assessments' in request.endpoint and request.endpoint != 'assessments.new' %}active{% endif %}">Assessments</a>
+                <a href="{{ url_for('findings.by_assessment') }}" class="{% if request.endpoint and 'findings' in request.endpoint %}active{% endif %}">Findings</a>
+                <a href="{{ url_for('engines.list_engines') }}" class="{% if request.endpoint and 'engines' in request.endpoint %}active{% endif %}">Engines</a>
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('phase_defs.list_view') }}" class="{% if request.endpoint and 'phase_defs' in request.endpoint %}active{% endif %}">Phases</a>
+                {% endif %}
+            {% endif %}
         </nav>
+        <div class="topbar-right">
+            {% if current_user.is_authenticated %}
+                <span class="topbar-user">{{ current_user.username }}</span>
+                {% if current_user.role == 'admin' %}<span class="badge-admin">admin</span>{% endif %}
+                {% if config.get('LLM_ENDPOINT') %}<span class="nav-llm online"><span class="ai-dot"></span> LLM</span>{% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="btn-small">Log out</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-small">Log in</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-small">Register</a>
+            {% endif %}
+        </div>
     </header>
-    <main>
+    <main class="main">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
@@ -37,6 +53,11 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
+    <footer class="statusbar">
+        <span class="statusbar-dot"></span>
+        <span>MAX v0.1.0</span>
+        {% if config.get('LLM_ENDPOINT') %}<span>LLM: {{ config.LLM_ENDPOINT }}</span>{% endif %}
+    </footer>
     {% block scripts %}{% endblock %}
 </body>
 </html>

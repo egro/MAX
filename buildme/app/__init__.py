@@ -7,6 +7,9 @@ from app.routes.auth import auth
 from app.routes.engines import engines
 from app.routes.assessments import assessments
 from app.routes.phase_definitions import phase_defs
+from app.routes.findings import findings
+from app.routes.reports import reports
+from app.routes.api import api
 from app.services.seed_data import seed_default_phases
 
 
@@ -21,6 +24,9 @@ def create_app(config_class=Config):
     app.register_blueprint(engines)
     app.register_blueprint(assessments)
     app.register_blueprint(phase_defs)
+    app.register_blueprint(findings)
+    app.register_blueprint(reports)
+    app.register_blueprint(api)
 
     @login_manager.user_loader
     def load_user(user_id):

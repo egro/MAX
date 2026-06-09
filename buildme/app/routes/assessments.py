@@ -10,6 +10,7 @@ from app.models.assessment import Assessment
 from app.models.assessment_phase import AssessmentPhase
 from app.models.phase_definition import PhaseDefinition
 from app.services.engine_registry import find_any_online_engine
+from app.services.llm_service import is_configured, query_llm
 from app.tasks.phase_tasks import run_phase_task
 
 assessments = Blueprint('assessments', __name__, url_prefix='/assessments')
@@ -150,6 +151,49 @@ def run_phase(id, phase_id):
     return jsonify({'status': 'started', 'task_id': task.id})
 
 
+@assessments.route('/<int:id>/run-all', methods=['POST'])
+@login_required
+def run_all_phases(id):
+    assessment = db.session.get(Assessment, id)
+    if not assessment:
+        return jsonify({'error': 'Assessment not found'}), 404
+
+    phases = (AssessmentPhase.query
+              .filter_by(assessment_id=id)
+              .filter(AssessmentPhase.status.in_(['pending', 'failed']))
+              .order_by(AssessmentPhase.order)
+              .all())
+
+    if not phases:
+        return jsonify({'error': 'No phases to run'}), 400
+
+    engine = find_any_online_engine()
+    if not engine:
+        return jsonify({'error': 'No online engines available'}), 503
+
+    results = []
+    for ap in phases:
+        ap.status = 'running'
+        ap.started_at = datetime.now(timezone.utc)
+        ap.engine_id = engine.id
+        ap.task_id = None
+        db.session.flush()
+
+        task = run_phase_task.apply_async(
+            args=[id, ap.id],
+            queue=engine.network_tag,
+        )
+
+        ap.task_id = task.id
+        db.session.flush()
+        results.append({'phase_id': ap.id, 'task_id': task.id})
+
+    assessment.status = 'running'
+    db.session.commit()
+
+    return jsonify({'status': 'started', 'phases': results})
+
+
 @assessments.route('/<int:id>/phases/<int:phase_id>/stop', methods=['POST'])
 @login_required
 def stop_phase(id, phase_id):
@@ -222,3 +266,55 @@ def stream_phase(id, phase_id):
             'X-Accel-Buffering': 'no',
         }
     )
+
+
+@assessments.route('/<int:id>/phases/<int:phase_id>/analyze', methods=['POST'])
+@login_required
+def analyze_phase(id, phase_id):
+    if not is_configured():
+        return jsonify({'error': 'LLM not configured — set LLM_ENDPOINT in .env'}), 503
+
+    ap = db.session.get(AssessmentPhase, phase_id)
+    if not ap or ap.assessment_id != id:
+        return jsonify({'error': 'Phase not found'}), 404
+
+    assessment = db.session.get(Assessment, id)
+    if not assessment:
+        return jsonify({'error': 'Assessment not found'}), 404
+
+    redis_url = current_app.config.get('REDIS_URL', 'redis://localhost:6379/0')
+    r = redis_lib.Redis.from_url(redis_url)
+    try:
+        history_key = f"phase:{id}:{phase_id}:history"
+        lines = r.lrange(history_key, 0, -1)
+    finally:
+        r.close()
+
+    if not lines:
+        return jsonify({'error': 'No output to analyze'}), 400
+
+    output_text = '\n'.join(
+        json.loads(msg.decode())["line"]
+        for msg in lines
+        if json.loads(msg.decode()).get("type") == "output"
+    )
+
+    system = (
+        "You are a security assessment analyst. Analyze the following penetration testing tool output. "
+        "Identify security findings, anomalies, and interesting observations. "
+        "For each finding, provide: title, severity (critical/high/medium/low/info), "
+        "the relevant evidence line(s), risk description, and remediation advice. "
+        "Respond in plain text with clear sections. Do not use markdown formatting."
+    )
+    prompt = (
+        f"Target: {assessment.target}\n"
+        f"Phase: {ap.phase_definition.label} ({ap.phase_definition.category})\n\n"
+        f"Tool output:\n{output_text[:15000]}\n\n"
+        "Analyze this output and identify all security findings."
+    )
+
+    result = query_llm(prompt, system_prompt=system, temperature=0.1, max_tokens=4096)
+    if result is None:
+        return jsonify({'error': 'LLM request failed — check server logs'}), 502
+
+    return jsonify({'analysis': result})

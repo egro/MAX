@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Findings{% endblock %}
+{% block content %}
+<h2>Findings</h2>
+
+<div style="margin-bottom:1rem">
+  <form method="GET" style="display:flex;gap:0.5rem;align-items:end;flex-wrap:wrap">
+    <div>
+      <label for="severity">Severity</label>
+      <select name="severity" style="width:auto" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="critical" {% if request.args.severity == 'critical' %}selected{% endif %}>Critical</option>
+        <option value="high" {% if request.args.severity == 'high' %}selected{% endif %}>High</option>
+        <option value="medium" {% if request.args.severity == 'medium' %}selected{% endif %}>Medium</option>
+        <option value="low" {% if request.args.severity == 'low' %}selected{% endif %}>Low</option>
+        <option value="info" {% if request.args.severity == 'info' %}selected{% endif %}>Info</option>
+      </select>
+    </div>
+    <div>
+      <label for="status">Status</label>
+      <select name="status" style="width:auto" onchange="this.form.submit()">
+        <option value="">All</option>
+        <option value="open" {% if request.args.status == 'open' %}selected{% endif %}>Open</option>
+        <option value="confirmed" {% if request.args.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+        <option value="false_positive" {% if request.args.status == 'false_positive' %}selected{% endif %}>False Positive</option>
+        <option value="accepted" {% if request.args.status == 'accepted' %}selected{% endif %}>Accepted</option>
+        <option value="remediated" {% if request.args.status == 'remediated' %}selected{% endif %}>Remediated</option>
+      </select>
+    </div>
+    <a href="{{ url_for('findings.new') }}" class="btn">New Finding</a>
+  </form>
+</div>
+
+{% if findings %}
+<table>
+  <thead>
+    <tr>
+      <th>Severity</th>
+      <th>Title</th>
+      <th>Status</th>
+      <th>CVSS</th>
+      <th>CWE</th>
+      <th>Phase</th>
+      <th>Created</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in findings %}
+    <tr data-finding-id="{{ f.id }}">
+      <td><span class="severity-{{ f.severity }}">{{ f.severity }}</span></td>
+      <td>{{ f.title }}</td>
+      <td class="status-{{ f.status }}">{{ f.status | replace('_', ' ') }}</td>
+      <td>{{ f.cvss_score if f.cvss_score else '--' }}</td>
+      <td>{{ f.cwe_id if f.cwe_id else '--' }}</td>
+      <td>
+        {% if f.phase %}
+          <a href="{{ url_for('assessments.detail', id=f.phase.assessment_id) }}">
+            {{ f.phase.phase_definition.label if f.phase.phase_definition else 'Phase #' + f.phase.id | string }}
+          </a>
+        {% else %}
+          --
+        {% endif %}
+      </td>
+      <td>{{ f.created_at | datetime }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('findings.delete', id=f.id) }}" style="display:inline">
+          <button type="submit" class="btn-small btn-danger" onclick="return confirm('Delete this finding?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No findings yet.</p>
+{% endif %}
+{% endblock %}

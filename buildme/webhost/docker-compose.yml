@@ -35,6 +35,9 @@ services:
       SECRET_KEY: ${SECRET_KEY:-changeme}
       DATABASE_URL: postgresql://${POSTGRES_USER:-MaxAttack}:${POSTGRES_PASSWORD:-Postgres_Password_changeMe!}@db:5432/${POSTGRES_DB:-MaxAttack}
       REDIS_URL: redis://:${REDIS_PASSWORD:-This-is-a-poor-Redis-password!}@redis:6379/0
+      LLM_ENDPOINT: ${LLM_ENDPOINT:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
     depends_on:
       db:
         condition: service_healthy

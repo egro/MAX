@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Report Preview{% endblock %}
+{% block content %}
+<h2>Report Preview</h2>
+<div class="report-actions">
+  <a href="{{ url_for('reports.download', assessment_id=assessment_id) }}" class="btn">Download .md</a>
+  <a href="{{ url_for('assessments.detail', id=assessment_id) }}" class="btn">Back to Assessment</a>
+</div>
+<div class="report-container">
+  <pre>{{- markdown -}}</pre>
+</div>
+{% endblock %}
