@@ -1,1 +1,3 @@
 buildme/webhost/.env
+buildme/engine/.env
+.gitignore
