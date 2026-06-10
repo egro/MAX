@@ -103,16 +103,16 @@ DEFAULT_PHASES = [
         "name": "web_enum",
         "label": "Web Enumeration",
         "category": "web",
-        "description": "Web server enumeration, known paths, and WAF detection",
-        "command_template": "nikto -h {target} 2>&1; wafw00f {target} 2>&1",
-        "suggested_tools": ["nikto", "wafw00f"]
+        "description": "Web server enumeration across common HTTP ports, known paths, and tech detection",
+        "command_template": "nikto -h {target} -port 80,443,8000,8080,8443,3000,5000,7077,9090 2>&1; whatweb -a 3 {target} 2>&1",
+        "suggested_tools": ["nikto", "whatweb"]
     },
     {
         "name": "web_vuln",
         "label": "Web Vulnerability",
         "category": "web",
-        "description": "Web application vulnerability scanning with nuclei",
-        "command_template": "nuclei -u {target} -severity critical,high,medium 2>&1",
+        "description": "Web application vulnerability scanning with nuclei across common HTTP ports",
+        "command_template": "nuclei -u {target} -ports 80,443,8000,8080,8443,3000,5000,7077,9090 -severity critical,high,medium 2>&1",
         "suggested_tools": ["nuclei"]
     },
     {
