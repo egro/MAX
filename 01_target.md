@@ -13,7 +13,7 @@
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `SCOPE_PORTS` | | Ports to test (default: 80, 443) |
+| `SCOPE_PORTS` | | (Auto-discovered by the platform — web phases dynamically scan all 65535 TCP ports for HTTP/S services) |
 | `SCOPE_PATHS` | | Specific paths in scope |
 | `EXCLUSIONS` | | Paths/URLs out of scope |
 
@@ -58,7 +58,7 @@ TARGET_NAME: Example Corp Web Portal
 
 AUTH_MODE: unauthenticated
 
-SCOPE_PORTS: 80, 443
+SCOPE_PORTS: (auto-discovered)
 EXCLUSIONS: /admin, /api/v1/private
 
 RATE_LIMIT: true

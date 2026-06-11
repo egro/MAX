@@ -84,11 +84,12 @@ whatweb TARGET_URL > outputs/recon/whatweb.txt
 
 # Phase 2
 gobuster dir -u TARGET_URL -w /usr/share/wordlists/dirb/common.txt > outputs/web/dir_scan.txt
-nikto -h TARGET_URL > outputs/web/nikto_scan.txt
+nikto -h TARGET_URL -port 80,443,8080,8443 > outputs/web/nikto_scan.txt
 nmap -p 443 --script=http-title,http-headers,ssl-cert TARGET_IP > outputs/nmap/headers.nmap
+# Note: In the automated platform, {ports} is resolved dynamically via full TCP port scan
 
 # Phase 3
-nmap -p 443 --script=http-methods TARGET_IP > outputs/nmap/http_methods.nmap
+nmap -p 80,443,8080,8443 --script=http-methods TARGET_IP > outputs/nmap/http_methods.nmap
 sqlmap -u TARGET_URL --batch > outputs/web/sqlmap_log.txt
 wafw00f TARGET_URL > outputs/cloud/wafw00f.txt
 

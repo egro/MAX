@@ -22,6 +22,7 @@ host TARGET_DOMAIN
 openssl s_client -connect TARGET_URL:443
 whatweb TARGET_URL
 ```
+> **Note:** In the automated platform, the **Web Enumeration** and **Web Vulnerability** phases dynamically discover all open HTTP/S ports (full `-p-` TCP scan) before running nikto/nuclei, so no manual port specification is needed.
 
 ---
 
@@ -40,9 +41,10 @@ whatweb TARGET_URL
 **Commands:**
 ```bash
 gobuster dir -u TARGET_URL -w /usr/share/wordlists/dirb/common.txt
-nikto -h TARGET_URL
+nikto -h TARGET_URL -port 80,443,8080,8443,3000,5000,7077,9090
 curl -s TARGET_URL | grep -i form
 ```
+> **Note:** In the automated platform, nikto receives `{ports}` resolved dynamically from a full TCP port scan, covering every discovered HTTP/S port — not just the common defaults listed above.
 
 ---
 
@@ -80,9 +82,10 @@ curl -X POST TARGET_URL -d "param=../../../etc/passwd"
 **Commands:**
 ```bash
 openssl s_client -connect TARGET_URL:443
-nmap -p 443 --script=http-methods TARGET_IP
+nmap -p 80,443,8080,8443 --script=http-methods TARGET_IP
 curl -I TARGET_URL | grep -i header
 ```
+> **Note:** In the automated platform, the **Auth Testing** phase dynamically discovers all open HTTP/S ports before running http-* scripts — not just the common defaults.
 
 ---
 

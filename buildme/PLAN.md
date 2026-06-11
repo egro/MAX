@@ -32,7 +32,7 @@ MAX automates security assessments by orchestrating a fleet of Kali-based engine
 | Topic | Decision |
 |-------|----------|
 | **Frontend styling** | Bare-bones HTML + minimal CSS, no framework. UI will evolve through iteration. |
-| **Phase execution** | PhaseDefinitions store a `command_template` with `{target}` placeholder. Engine substitutes and executes via shell. |
+| **Phase execution** | PhaseDefinitions store a `command_template` with `{target}` and optional `{ports}` placeholders. Engine substitutes `{target}` directly and resolves `{ports}` via dynamic two-pass nmap scan (all 65535 TCP ports, then service detection on open ports). |
 | **Phase error handling** | Abort immediately on tool failure, mark phase as `failed`. No skip-and-continue. |
 | **Auth creds storage** | Fernet symmetric encryption using Flask's `SECRET_KEY`. Decrypted at runtime when engine needs them. |
 | **Assessment states** | `created` → `running` → `paused` → `completed` / `failed`. User can pause between phases. |
@@ -69,10 +69,10 @@ Shipped with the app and stored in the DB. Users with `admin` role can create/ed
 | container | Container/Cloud | host | `docker ps -a 2>&1; docker info 2>&1` |
 | recon | Reconnaissance | web | `whois {target} 2>&1; whatweb {target} 2>&1` |
 | ssl_tls | SSL/TLS Audit | web | `sslscan {target} 2>&1; testssl {target} 2>&1` |
-| web_enum | Web Enumeration | web | `nikto -h {target} 2>&1; wafw00f {target} 2>&1` |
-| web_vuln | Web Vulnerability | web | `nuclei -u {target} -severity critical,high,medium 2>&1` |
+| web_enum | Web Enumeration | web | `nikto -h {target} -port {ports} 2>&1; whatweb -a 3 {target} 2>&1` |
+| web_vuln | Web Vulnerability | web | `nuclei -u {target} -ports {ports} -severity critical,high,medium 2>&1` |
 | web_fuzz | Web Fuzzing | web | `gobuster dir -u {target} -w /usr/share/wordlists/dirb/common.txt 2>&1; ffuf -u {target}/FUZZ -w /usr/share/wordlists/dirb/common.txt 2>&1` |
-| auth | Auth Testing | web | `nmap -p 80,443 --script http-auth-finder {target} 2>&1` |
+| auth | Auth Testing | web | `nmap -p {ports} --script http-auth-finder {target} 2>&1` |
 
 ## Progress Summary
 
@@ -136,6 +136,7 @@ buildme/
 │   │   ├── engine_registry.py    # Engine selection/registration logic
 │   │   ├── finding_extractor.py  # Auto-extraction + LLM-enhanced extraction
 │   │   ├── llm_service.py        # OpenAI-compatible LLM client
+│   │   ├── port_resolver.py      # Dynamic HTTP/S port discovery (two-pass nmap)
 │   │   ├── report_builder.py     # Jinja2 -> Markdown report compilation
 │   │   └── seed_data.py          # Seed default phase definitions
 │   ├── tasks/
@@ -229,7 +230,7 @@ buildme/
 ## Phase E: Celery Task Framework + Live Output `[DONE]`
 
 - [x] Celery config in `extensions.py` (broker=redis with password, result backend=redis)
-- [x] `app/services/tool_runner.py` — subprocess wrapper: takes command_template + target, substitutes `{target}`, executes, streams output via Redis pub/sub with history buffer
+- [x] `app/services/tool_runner.py` — subprocess wrapper: takes command_template + target, substitutes `{target}` and dynamically resolves `{ports}` via two-pass nmap scan, executes, streams output via Redis pub/sub with history buffer
 - [x] `app/tasks/phase_tasks.py` — Celery task `run_phase_task` dispatches phase execution, updates status/engine in DB
 - [x] SSE endpoint `GET /assessments/<id>/phases/<phase_id>/stream` — replays history then subscribes to live Redis pub/sub
 - [x] Phase control buttons in detail.html — `Run` (pending/failed) and `Stop` (running), wired to POST endpoints

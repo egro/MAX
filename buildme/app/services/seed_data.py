@@ -103,16 +103,16 @@ DEFAULT_PHASES = [
         "name": "web_enum",
         "label": "Web Enumeration",
         "category": "web",
-        "description": "Web server enumeration across common HTTP ports, known paths, and tech detection",
-        "command_template": "nikto -h {target} -port 80,443,8000,8080,8443,3000,5000,7077,9090 2>&1; whatweb -a 3 {target} 2>&1",
+        "description": "Web server enumeration with dynamic HTTP port discovery, known path scanning, and tech detection",
+        "command_template": "nikto -h {target} -port {ports} 2>&1; whatweb -a 3 {target} 2>&1",
         "suggested_tools": ["nikto", "whatweb"]
     },
     {
         "name": "web_vuln",
         "label": "Web Vulnerability",
         "category": "web",
-        "description": "Web application vulnerability scanning with nuclei across common HTTP ports",
-        "command_template": "nuclei -u {target} -ports 80,443,8000,8080,8443,3000,5000,7077,9090 -severity critical,high,medium 2>&1",
+        "description": "Web application vulnerability scanning with nuclei across dynamically discovered HTTP/S ports",
+        "command_template": "nuclei -u {target} -ports {ports} -severity critical,high,medium 2>&1",
         "suggested_tools": ["nuclei"]
     },
     {
@@ -128,7 +128,7 @@ DEFAULT_PHASES = [
         "label": "Auth Testing",
         "category": "web",
         "description": "HTTP authentication method discovery",
-        "command_template": "nmap -p 80,443 --script http-auth-finder {target} 2>&1",
+        "command_template": "nmap -p {ports} --script http-auth-finder {target} 2>&1",
         "suggested_tools": ["nmap"]
     },
 ]

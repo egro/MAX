@@ -111,6 +111,7 @@ buildme/
 │   │   ├── engine_registry.py # Online engine selection
 │   │   ├── finding_extractor.py # Auto-extraction + LLM-enhanced extraction
 │   │   ├── llm_service.py    # OpenAI-compatible LLM client
+│   │   ├── port_resolver.py  # Dynamic HTTP/S port discovery (two-pass nmap scan + Redis cache)
 │   │   ├── report_builder.py # Report compilation with optional AI summary
 │   │   └── seed_data.py      # Default phase definition seeding
 │   ├── tasks/

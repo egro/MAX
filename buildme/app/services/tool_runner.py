@@ -9,6 +9,21 @@ def run_command(command_template, target, assessment_id, phase_id, redis_url):
     history_key = f"phase:{assessment_id}:{phase_id}:history"
 
     command = command_template.replace("{target}", target)
+    if "{ports}" in command:
+        from app.services.port_resolver import resolve_web_ports
+        msg = json.dumps({"type": "output", "line": "[*] Scanning for open HTTP/HTTPS ports..."})
+        r.publish(channel, msg)
+        r.rpush(history_key, msg)
+        r.expire(history_key, 3600)
+
+        ports = resolve_web_ports(target, redis_url)
+
+        msg = json.dumps({"type": "output", "line": f"[+] Web ports discovered: {ports}"})
+        r.publish(channel, msg)
+        r.rpush(history_key, msg)
+        r.expire(history_key, 3600)
+
+        command = command.replace("{ports}", ports)
     success = False
 
     output_count = 0

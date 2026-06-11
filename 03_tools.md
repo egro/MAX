@@ -34,7 +34,7 @@ which dig nslookup host whatweb curl wget nmap nikto gobuster sqlmap nuclei ffuf
 | `gobuster` | Dir busting | `gobuster dir -u URL -w wordlist.txt` |
 | `dirb` | Dir scanning | `dirb URL wordlist.txt` |
 | `ffuf` | Fast fuzzing | `ffuf -u URL/FUZZ -w wordlist.txt` |
-| `nikto` | Web scanner | `nikto -h URL` |
+| `nikto` | Web scanner | `nikto -h URL -port 80,443,8080` |
 
 ### 4. Vulnerability Testing
 
@@ -124,6 +124,9 @@ mkdir -p outputs/{nmap,web,cloud,recon,scans}
 
 Example:
 ```
-| 2026-04-14 | dig www.example.com +short | outputs/recon/dns.txt |
-| 2026-04-14 | nikto -h https://www.example.com | outputs/web/nikto.txt |
+| 2026-04-14 | dig www.example.com +short          | outputs/recon/dns.txt   |
+| 2026-04-14 | nikto -h https://www.example.com    | outputs/web/nikto.txt   |
+|            |   -port 80,443,8080,8443            |                         |
 ```
+
+> **Note:** In the automated platform, the `{ports}` placeholder is resolved dynamically by scanning all 65535 TCP ports for HTTP/S services before each web phase runs. Hardcoded port lists are no longer needed.
